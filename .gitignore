@@ -1,0 +1,6 @@
+build
+.u-boot-2020.04.tar.bz2
+
+u-boot
+u-boot.*
+u-boot*.bin

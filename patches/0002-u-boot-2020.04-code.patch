@@ -1,0 +1,22 @@
+--- a/u-boot-2020.04/cmd/axera/ddr_dfs/ddr_dfs.c	2025-05-09 15:35:10.778031823 +0800
++++ b/u-boot-2020.04/cmd/axera/ddr_dfs/ddr_dfs.c	2025-05-09 15:38:11.945616976 +0800
+@@ -5,7 +5,7 @@
+  */
+ #include <stdio.h>
+ #include <common.h>
+-#include "../../drivers/ddr/axera/ax650x_lpddr4x.h"
++#include "../../../drivers/ddr/axera/ax650x_lpddr4x.h"
+ 
+ #define DDR0_GLB_REG_BASE               0x8000000
+ #define DDR1_GLB_REG_BASE               0xC000000
+--- a/u-boot-2020.04/arch/arm/mach-axera/ax650/dphyrx.c	2025-05-09 15:40:03.543823215 +0800
++++ b/u-boot-2020.04/arch/arm/mach-axera/ax650/dphyrx.c	2025-05-09 15:42:43.262977972 +0800
+@@ -1,7 +1,7 @@
+ #include <common.h>
+ #include <asm/arch/ax650.h>
+ #include <asm/io.h>
+-#include <early_printf.h>
++#include "early_printf.h"
+ 
+ typedef enum dphyrx_pin_func_type{
+ 	AX_FUNC_NONE = 0,
