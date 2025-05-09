@@ -1,4 +1,4 @@
-# MODULE_LLM_UBOOT
+# MODULE_650_UBOOT
 Patch for the uboot adapted for the module_llm development board.  
 Compilation will automatically download and apply the relevant patches to compile into a uboot project.  
 
@@ -25,7 +25,6 @@ make Configuring
 ```
 
 
-KCFLAGS="-DOPTEE_BOOT -DOPTEE_IMAGE_ADDR="0x134000000" -DOPTEE_RESERVED_SIZE="0x2000000" -DOPTEE_SHMEM_SIZE="0x200000""
 
 
 
