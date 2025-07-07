@@ -72,3 +72,13 @@
 		status = "okay";
 	};
 };
+
+&pcie0_rc {
+	status = "okay";
+};
+&pcie1_rc {
+	status = "okay";
+};
+&ahci {
+	status = "disabled";
+};
