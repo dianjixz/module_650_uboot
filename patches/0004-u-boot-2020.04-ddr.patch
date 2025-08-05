@@ -1,0 +1,20 @@
+--- u-boot-2020.04/drivers/ddr/axera/ddrc_init.h	2025-08-04 11:51:57.257850242 +0800
++++ "u-boot-2020.04/drivers/ddr/axera/ddrc_init copy.h"	2025-08-04 12:01:03.248616063 +0800
+@@ -6,7 +6,7 @@
+  /* ddr wait time is 100ms*/
+ #define DDR_WAIT_TIMEOUT 1000000
+ static int dp_slp_en __attribute__((section(".data"))) = 0;
+-static int curr_rank_num __attribute__((section(".data"))) = 2;	//default dual rank
++static int curr_rank_num __attribute__((section(".data"))) = 1;	//default dual rank
+ static int use_lpddr4 __attribute__((section(".data"))) = 0;	//default lpddr4x
+ static int lpddr4x_6GB __attribute__((section(".data"))) = 0;
+ static int lpddr4x_8GB __attribute__((section(".data"))) = 0;
+@@ -139,7 +139,7 @@
+ 		core_write_word(base_addr + DDRC_ADDRMAP4, 0x00001f1f);
+ 		core_write_word(base_addr + DDRC_ADDRMAP5, 0x08080808);
+ 		core_write_word(base_addr + DDRC_ADDRMAP6, 0x08080808);
+-		core_write_word(base_addr + DDRC_ADDRMAP7, 0x00000f0f);
++		core_write_word(base_addr + DDRC_ADDRMAP7, 0x00000f08);
+ 	}
+ }
+ 
