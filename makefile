@@ -77,11 +77,12 @@ endif
 # ============================================================================
 # 主要目标
 # ============================================================================
-SIGN_EXTS := all install %_defconfig
+SIGN_EXTS := all install %_defconfig oldconfig %.bin u-boot
 
 define SIGN_RULE
 $(1): _build_init
 	$(KERNEL_MAKE) $(MAKECMDGOALS)
+	[ -f '$(SRC_DIR)/u-boot' ] && cp $(SRC_DIR)/u-boot* . || exit 0
 endef
 
 $(foreach ext,$(SIGN_EXTS),$(eval $(call SIGN_RULE,$(ext))))
