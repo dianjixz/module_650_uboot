@@ -34,7 +34,7 @@ CONFIG_DIR          :=
 # 下载目录配置
 # ----------------------------------------------------------------------------
 # 外部下载目录路径
-DOWNLOAD_DIR        := ../../../dl
+DOWNLOAD_DIR        := $(PWD)/../../../dl
 
 # ----------------------------------------------------------------------------
 # 交叉编译配置（如需要请取消注释）
@@ -47,11 +47,18 @@ DOWNLOAD_DIR        := ../../../dl
 # 内部变量 - 通常不需要修改
 # ============================================================================
 
+# 确定下载目录
+
+DL_DIR := .
+ifneq ($(wildcard $(DOWNLOAD_DIR)),)
+	DL_DIR := $(DOWNLOAD_DIR)
+endif
+
 # 目录和文件定义
 BUILD_DIR           := build
 SRC_DIR             := $(BUILD_DIR)/u-boot-$(UBOOT_VERSION)
 UBOOT_TAR_NAME      := $(UBOOT_TAR_SHA)-u-boot-$(UBOOT_VERSION).tar.bz2
-UBOOT_TAR			:= .$(UBOOT_TAR_NAME)
+UBOOT_TAR			:= $(DL_DIR)/.$(UBOOT_TAR_NAME)
 
 # 收集源文件
 PATCHES             := $(sort $(wildcard $(PATCH_DIR)/*.patch))
@@ -60,12 +67,7 @@ CONFIG_FILES        := $(wildcard $(CONFIG_DIR)/*.config)
 SYMLINK_DIRS      	:= 
 
 
-# 确定下载目录
 
-DL_DIR := .
-ifneq ($(wildcard $(DOWNLOAD_DIR)),)
-	DL_DIR := $(DOWNLOAD_DIR)
-endif
 
 # 内核编译命令
 ifeq ($(strip $(M)),)
