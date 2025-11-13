@@ -34,7 +34,7 @@ CONFIG_DIR          :=
 # 下载目录配置
 # ----------------------------------------------------------------------------
 # 外部下载目录路径
-DOWNLOAD_DIR        := $(PWD)/../../../dl
+DOWNLOAD_DIR        := $(PWD)/dl
 
 # ----------------------------------------------------------------------------
 # 交叉编译配置（如需要请取消注释）
@@ -71,7 +71,7 @@ SYMLINK_DIRS      	:=
 
 # 内核编译命令
 ifeq ($(strip $(M)),)
-	KERNEL_MAKE := +$(MAKE) -C $(SRC_DIR) PWD=$(PWD) dtb-y=m5stack-ax650.dtb DEVICE_TREE=m5stack-ax650 $(KERNEL_EXTRA_PARAMS)
+	KERNEL_MAKE := +$(MAKE) -C $(SRC_DIR)  dtb-y=m5stack-ax650.dtb DEVICE_TREE=m5stack-ax650 $(KERNEL_EXTRA_PARAMS)
 else
 	KERNEL_MAKE := $(KERNEL_MAKE) M=$(M)
 endif
@@ -106,7 +106,7 @@ Extracting: $(BUILD_DIR)/.stamp_extract
 # 内部辅助目标（不直接调用）
 # ============================================================================
 
-$(BUILD_DIR)/.stamp_config : $(CONFIG_FILES) $(BUILD_DIR)/.stamp_extract
+$(BUILD_DIR)/.stamp_config : $(CONFIG_FILES) $(BUILD_DIR)/.stamp_patching
 	cat $(SRC_DIR)/configs/$(BASE_DEFCONFIG)	$(CONFIG_FILES) > $(SRC_DIR)/configs/$(TARGET_DEFCONFIG) && touch $@
 
 $(BUILD_DIR)/.stamp_patching : $(PATCHES) $(BUILD_DIR)/.stamp_extract
@@ -122,7 +122,10 @@ $(BUILD_DIR)/.stamp_extract : $(UBOOT_TAR)
 	 
 
 $(UBOOT_TAR) : README.md
-	wget --passive-ftp -nd -t 3 -O '$(UBOOT_TAR)' '$(UBOOT_TAR_URL)' || rm -f '$(UBOOT_TAR)'
+	@if [ ! -f "$(UBOOT_TAR)" ]; then \
+		wget --passive-ftp -nd -t 3 -O '$(UBOOT_TAR)' '$(UBOOT_TAR_URL)' || rm -f '$(UBOOT_TAR)'; \
+	fi
+	
 
 
 
