@@ -1,78 +1,167 @@
 # SPDX-FileCopyrightText: 2024 M5Stack Technology CO LTD
-#
 # SPDX-License-Identifier: MIT
 
-PATCH_DIR := patches
-SRC_DIR := build/u-boot-2020.04
-PATCHES := $(wildcard patches/*.patch)
-DTSS := $(wildcard uboot-dts/*.dts*)
-CONFIG_FILES := $(wildcard *.config)
-UBOOT_TAR_SHA := fe732aaf037d9cc3c0909bad8362af366ae964bbdac6913a34081ff4ad565372
-# AX630C_KERNEL_PARAM := ARCH=arm CROSS_COMPILE=aarch64-none-linux-gnu- 
-# KERNEL_MAKE := cd $(SRC_DIR) ; $(MAKE) $(AX630C_KERNEL_PARAM)
+# ============================================================================
+# 配置区域 - 根据需求修改此部分
+# ============================================================================
 
-KERNEL_MAKE := cd $(SRC_DIR) ; $(MAKE) 
-%:
-	@if [ "$(MAKECMDGOALS)" != "build_init" ] ; then \
-		$(MAKE) build_init ; \
-		$(KERNEL_MAKE) dtb-y=m5stack-ax650.dtb DEVICE_TREE=m5stack-ax650 $(MAKECMDGOALS) ; \
-		if [ -f "u-boot" ] ; then cp u-boot* ../.. ; fi ; \
-	fi
+# ----------------------------------------------------------------------------
+# Uboot 版本配置
+# ----------------------------------------------------------------------------
+UBOOT_VERSION       := 2020.04
+UBOOT_TAR_SHA       := fe732aaf037d9cc3c0909bad8362af366ae964bbdac6913a34081ff4ad565372
 
-build_init:Configuring
+# 源码下载 URL（可选其他镜像）
+UBOOT_TAR_URL       := https://ftp.denx.de/pub/u-boot/u-boot-$(UBOOT_VERSION).tar.bz2
 
-Extracting:
-	@$(MAKE) build/check_build.tmp
-	@$(MAKE) build/check_dts.tmp
+# ----------------------------------------------------------------------------
+# 板级配置
+# ----------------------------------------------------------------------------
+BOARD_NAME          := m5stack_AX650C
+BOARD_ARCH          := arm
+BASE_DEFCONFIG      := AX650_emmc_defconfig
+TARGET_DEFCONFIG    := $(BOARD_NAME)_emmc_$(BOARD_ARCH)_defconfig
 
-Patching:Extracting 
-	@$(MAKE) build/check_patch.tmp
+# ----------------------------------------------------------------------------
+# 目录配置
+# ----------------------------------------------------------------------------
+PATCH_DIR           := patches
+DTS_DIR             := uboot-dts
+CONFIG_DIR          := 
 
-Configuring:Patching 
-	@$(MAKE) build/check_config.tmp  
 
-build/check_build.tmp:$(PATCHES)
-	[ -d 'build' ] || mkdir build
-	@if [ -f '.stamp_extracted' ] ; then \
-		[ -f '../../../dl/u-boot-2020.04.tar.bz2' ] || wget --passive-ftp -nd -t 3 -O '../../../dl/u-boot-2020.04.tar.bz2' 'https://ftp.denx.de/pub/u-boot/u-boot-2020.04.tar.bz2' ; \
-		calculated_hash=$$(sha256sum ../../../dl/u-boot-2020.04.tar.bz2 | awk '{ print $$1 }'); \
-		if [ "$$calculated_hash" != "$(UBOOT_TAR_SHA)" ]; then \
-			rm ../../../dl/u-boot-2020.04.tar.bz2 ; \
-			exit 1; \
-		fi ; \
-		[ -d 'build/u-boot-2020.04' ] || tar xjf ../../../dl/u-boot-2020.04.tar.bz2 -C build/ ; \
-	else \
-		[ -f '.u-boot-2020.04.tar.bz2' ] || wget --passive-ftp -nd -t 3 -O '.u-boot-2020.04.tar.bz2' 'https://ftp.denx.de/pub/u-boot/u-boot-2020.04.tar.bz2' ; \
-		calculated_hash=$$(sha256sum .u-boot-2020.04.tar.bz2 | awk '{ print $$1 }') ; \
-		if [ "$$calculated_hash" != "$(UBOOT_TAR_SHA)" ]; then \
-			rm .u-boot-2020.04.tar.bz2 ; \
-			exit 1; \
-		fi ; \
-		[ -d 'build/u-boot-2020.04' ] || tar xjf .u-boot-2020.04.tar.bz2 -C build/ ; \
-	fi
-	@touch build/check_build.tmp
+# ----------------------------------------------------------------------------
+# 下载目录配置
+# ----------------------------------------------------------------------------
+# 外部下载目录路径
+DOWNLOAD_DIR        := ../../../dl
 
-build/check_dts.tmp:$(DTSS)
-	@cp uboot-dts/* $(SRC_DIR)/arch/arm/dts/
-	@touch build/check_dts.tmp
+# ----------------------------------------------------------------------------
+# 交叉编译配置（如需要请取消注释）
+# ----------------------------------------------------------------------------
+# ARCH              := arm64
+# CROSS_COMPILE     := aarch64-none-linux-gnu-
+# KERNEL_EXTRA_PARAMS := ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE)
 
-build/check_patch.tmp:$(PATCHES)
-	@[ -d 'build/u-boot-2020.04/arch/arm/mach-axera' ] || {\
-		for patch in $^; do \
-			echo "Applying $$patch..."; \
-			patch -p1 -d build <$$patch || { echo "Failed to apply $$patch"; exit 1; } \
-		done ; \
-	}
-	@touch build/check_patch.tmp
+# ============================================================================
+# 内部变量 - 通常不需要修改
+# ============================================================================
 
-build/check_config.tmp:$(CONFIG_FILES)
-	@touch build/check_config.tmp
+# 目录和文件定义
+BUILD_DIR           := build
+SRC_DIR             := $(BUILD_DIR)/u-boot-$(UBOOT_VERSION)
+UBOOT_TAR_NAME      := $(UBOOT_TAR_SHA)-u-boot-$(UBOOT_VERSION).tar.bz2
+UBOOT_TAR			:= .$(UBOOT_TAR_NAME)
+
+# 收集源文件
+PATCHES             := $(sort $(wildcard $(PATCH_DIR)/*.patch))
+DTSS                := $(wildcard $(DTS_DIR)/*.dts*) $(wildcard $(DTS_DIR)/*.h)
+CONFIG_FILES        := $(wildcard $(CONFIG_DIR)/*.config)
+SYMLINK_DIRS      	:= 
+
+
+# 确定下载目录
+
+DL_DIR := .
+ifneq ($(wildcard $(DOWNLOAD_DIR)),)
+	DL_DIR := $(DOWNLOAD_DIR)
+endif
+
+# 内核编译命令
+ifeq ($(strip $(M)),)
+	KERNEL_MAKE := +$(MAKE) -C $(SRC_DIR) PWD=$(PWD) dtb-y=m5stack-ax650.dtb DEVICE_TREE=m5stack-ax650 $(KERNEL_EXTRA_PARAMS)
+else
+	KERNEL_MAKE := $(KERNEL_MAKE) M=$(M)
+endif
+
+# ============================================================================
+# 主要目标
+# ============================================================================
+SIGN_EXTS := all install %_defconfig
+
+define SIGN_RULE
+$(1): _build_init
+	$(KERNEL_MAKE) $(MAKECMDGOALS)
+endef
+
+$(foreach ext,$(SIGN_EXTS),$(eval $(call SIGN_RULE,$(ext))))
+
+# ============================================================================
+# 构建流程
+# ============================================================================
+
+# 构建初始化总入口
+_build_init: Patching Extracting
+
+# 构建流程依赖链
+
+Patching: $(BUILD_DIR)/.stamp_patching $(BUILD_DIR)/.stamp_dtsing $(BUILD_DIR)/.stamp_config
+
+Extracting: $(BUILD_DIR)/.stamp_extract
+
+# ============================================================================
+# 内部辅助目标（不直接调用）
+# ============================================================================
+
+$(BUILD_DIR)/.stamp_config : $(CONFIG_FILES) $(BUILD_DIR)/.stamp_extract
+	cat $(SRC_DIR)/configs/$(BASE_DEFCONFIG)	$(CONFIG_FILES) > $(SRC_DIR)/configs/$(TARGET_DEFCONFIG) && touch $@
+
+$(BUILD_DIR)/.stamp_patching : $(PATCHES) $(BUILD_DIR)/.stamp_extract
+	for p in $(PATCHES); do patch -p1 -d $(SRC_DIR) < $$p; done && touch $@
+
+$(BUILD_DIR)/.stamp_dtsing : $(DTSS) $(BUILD_DIR)/.stamp_extract
+	cp $(DTSS) $(SRC_DIR)/arch/$(BOARD_ARCH)/dts/ && touch $@
+
+
+$(BUILD_DIR)/.stamp_extract : $(UBOOT_TAR)
+	mkdir -p $(BUILD_DIR)
+	tar xjf $(UBOOT_TAR) -C $(BUILD_DIR) && { for d in $(SYMLINK_DIRS); do ln -sf $(SRC_DIR)/$$d $$d; done } && touch $@
+	 
+
+$(UBOOT_TAR) : README.md
+	wget --passive-ftp -nd -t 3 -O '$(UBOOT_TAR)' '$(UBOOT_TAR_URL)' || rm -f '$(UBOOT_TAR)'
+
+
+
+
+
+
+
+AXERA_TOOL_DIR := axerabin/tools/bin
+SIGN_SCRIPT := $(AXERA_TOOL_DIR)/imgsign/sec_boot_AX620E_sign.py
+BINARIES_DIR := $(SRC_DIR)
+PUB_KEY := $(AXERA_TOOL_DIR)/imgsign/public.pem
+PRIV_KEY := $(AXERA_TOOL_DIR)/imgsign/private.pem
+SIGN_PARAMS := -cap 0x54FAFE -key_bit 2048
+
+
+Packaxera: 
+	$(AXERA_TOOL_DIR)/ax_gzip -9 $(BINARIES_DIR)/u-boot.bin
+	python3 $(SIGN_SCRIPT) -i $(BINARIES_DIR)/u-boot_axgzip.bin \
+		-o $(BINARIES_DIR)/u-boot_signed.bin -pub $(PUB_KEY) -prv $(PRIV_KEY) $(SIGN_PARAMS)
+
+linux-distclean:
+	@$(KERNEL_MAKE) distclean
 
 distclean:
 	@rm -f build -rf
-	@rm -f u-boot u-boot.* u-boot*.bin
+	@rm -f ._build.lock
 
-uboot-distclean:
-	@$(KERNEL_MAKE) distclean
-	@rm -f build/check_config.tmp 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

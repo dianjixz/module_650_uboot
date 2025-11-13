@@ -1,5 +1,5 @@
---- u-boot-2020.04/drivers/ddr/axera/ddrc_init.h	2025-08-04 11:51:57.257850242 +0800
-+++ "u-boot-2020.04/drivers/ddr/axera/ddrc_init copy.h"	2025-08-04 12:01:03.248616063 +0800
+--- a/drivers/ddr/axera/ddrc_init.h	2025-08-04 11:51:57.257850242 +0800
++++ b/drivers/ddr/axera/ddrc_init.h	2025-08-04 12:01:03.248616063 +0800
 @@ -6,7 +6,7 @@
   /* ddr wait time is 100ms*/
  #define DDR_WAIT_TIMEOUT 1000000
