@@ -70,11 +70,7 @@ SYMLINK_DIRS      	:=
 
 
 # 内核编译命令
-ifeq ($(strip $(M)),)
-	KERNEL_MAKE := +$(MAKE) -C $(SRC_DIR)  dtb-y=m5stack-ax650.dtb DEVICE_TREE=m5stack-ax650 $(KERNEL_EXTRA_PARAMS)
-else
-	KERNEL_MAKE := $(KERNEL_MAKE) M=$(M)
-endif
+KERNEL_MAKE := +$(MAKE) -C $(SRC_DIR)  dtb-y=m5stack-ax650.dtb DEVICE_TREE=m5stack-ax650 $(KERNEL_EXTRA_PARAMS)
 
 # ============================================================================
 # 主要目标
@@ -124,6 +120,8 @@ $(BUILD_DIR)/.stamp_extract : $(UBOOT_TAR)
 $(UBOOT_TAR) : README.md
 	@if [ ! -f "$(UBOOT_TAR)" ]; then \
 		wget --passive-ftp -nd -t 3 -O '$(UBOOT_TAR)' '$(UBOOT_TAR_URL)' || rm -f '$(UBOOT_TAR)'; \
+	else \
+		touch '$(UBOOT_TAR)'; \
 	fi
 	
 
