@@ -150,6 +150,7 @@ linux-distclean:
 distclean:
 	@rm -f build -rf
 	@rm -f ._build.lock
+	@rm -f u-boot*
 
 
 
