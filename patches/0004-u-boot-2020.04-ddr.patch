@@ -5,7 +5,7 @@
  #define DDR_WAIT_TIMEOUT 1000000
  static int dp_slp_en __attribute__((section(".data"))) = 0;
 -static int curr_rank_num __attribute__((section(".data"))) = 2;	//default dual rank
-+static int curr_rank_num __attribute__((section(".data"))) = 1;	//default dual rank
++static int curr_rank_num __attribute__((section(".data"))) =2;	//default dual rank
  static int use_lpddr4 __attribute__((section(".data"))) = 0;	//default lpddr4x
  static int lpddr4x_6GB __attribute__((section(".data"))) = 0;
  static int lpddr4x_8GB __attribute__((section(".data"))) = 0;
