@@ -132,17 +132,28 @@ $(UBOOT_TAR) : README.md
 
 
 AXERA_TOOL_DIR := axerabin/tools/bin
-SIGN_SCRIPT := $(AXERA_TOOL_DIR)/imgsign/sec_boot_AX620E_sign.py
+SIGN_SCRIPT := $(AXERA_TOOL_DIR)/imgsign/spl_AX650_sign_bk.py
+SIGN_SCRIPT1 := $(AXERA_TOOL_DIR)/imgsign/fdl_AX650_sign.py
 BINARIES_DIR := $(SRC_DIR)
+OUT_BINARIES_DIR := $(SRC_DIR)/..
 PUB_KEY := $(AXERA_TOOL_DIR)/imgsign/public.pem
 PRIV_KEY := $(AXERA_TOOL_DIR)/imgsign/private.pem
-SIGN_PARAMS := -cap 0x54FAFE -key_bit 2048
+SIGN_PARAMS := -cap 0x4fafe -partsize 0x180000
 
 
 Packaxera: 
-	$(AXERA_TOOL_DIR)/ax_gzip -9 $(BINARIES_DIR)/u-boot.bin
-	python3 $(SIGN_SCRIPT) -i $(BINARIES_DIR)/u-boot_axgzip.bin \
-		-o $(BINARIES_DIR)/u-boot_signed.bin -pub $(PUB_KEY) -prv $(PRIV_KEY) $(SIGN_PARAMS)
+	openssl aes-256-ecb -e -in $(BINARIES_DIR)/u-boot.bin -out $(OUT_BINARIES_DIR)/u-boot_enc.bin -K 00000000000000000000000000000000 -nosalt -p
+	python3 $(SIGN_SCRIPT) -i $(BINARIES_DIR)/u-boot.bin \
+		-o $(OUT_BINARIES_DIR)/u-boot_signed.bin -ob $(OUT_BINARIES_DIR)/uboot_bk.bin -pub $(PUB_KEY) -prv $(PRIV_KEY) \
+		-fw $(AXERA_TOOL_DIR)/imgsign/eip.bin  $(SIGN_PARAMS)
+
+	python3 $(SIGN_SCRIPT) -i $(BINARIES_DIR)/u-boot_enc.bin \
+		-o $(OUT_BINARIES_DIR)/u-boot_enc_signed.bin -ob $(OUT_BINARIES_DIR)/uboot_enc_bk.bin -pub $(PUB_KEY) -prv $(PRIV_KEY) \
+		-fw $(AXERA_TOOL_DIR)/imgsign/eip.bin  $(SIGN_PARAMS)
+
+	python3 $(SIGN_SCRIPT1) -i $(BINARIES_DIR)/u-boot.bin \
+		-o $(OUT_BINARIES_DIR)/fdl2_signed.bin -pub $(PUB_KEY) -prv $(PRIV_KEY) \
+		-fw $(AXERA_TOOL_DIR)/imgsign/eip.bin  $(SIGN_PARAMS)
 
 linux-distclean:
 	@$(KERNEL_MAKE) distclean
