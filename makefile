@@ -147,7 +147,7 @@ Packaxera:
 		-o $(OUT_BINARIES_DIR)/u-boot_signed.bin -ob $(OUT_BINARIES_DIR)/uboot_bk.bin -pub $(PUB_KEY) -prv $(PRIV_KEY) \
 		-fw $(AXERA_TOOL_DIR)/imgsign/eip.bin  $(SIGN_PARAMS)
 
-	python3 $(SIGN_SCRIPT) -i $(BINARIES_DIR)/u-boot_enc.bin \
+	python3 $(SIGN_SCRIPT) -i $(OUT_BINARIES_DIR)/u-boot_enc.bin \
 		-o $(OUT_BINARIES_DIR)/u-boot_enc_signed.bin -ob $(OUT_BINARIES_DIR)/uboot_enc_bk.bin -pub $(PUB_KEY) -prv $(PRIV_KEY) \
 		-fw $(AXERA_TOOL_DIR)/imgsign/eip.bin  $(SIGN_PARAMS)
 
