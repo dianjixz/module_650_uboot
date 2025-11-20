@@ -131,29 +131,24 @@ $(UBOOT_TAR) : README.md
 
 
 
-AXERA_TOOL_DIR := axerabin/tools/bin
-SIGN_SCRIPT := $(AXERA_TOOL_DIR)/imgsign/spl_AX650_sign_bk.py
-SIGN_SCRIPT1 := $(AXERA_TOOL_DIR)/imgsign/fdl_AX650_sign.py
+AXERA_TOOLS_PATH := $(THIS_DIR)/axerabin/tools/bin
 BINARIES_DIR := $(SRC_DIR)
 OUT_BINARIES_DIR := $(SRC_DIR)/..
-PUB_KEY := $(AXERA_TOOL_DIR)/imgsign/public.pem
-PRIV_KEY := $(AXERA_TOOL_DIR)/imgsign/private.pem
-SIGN_PARAMS := -cap 0x4fafe -partsize 0x180000
-
+include $(AXERA_TOOLS_PATH)/BuildEnv.mk
 
 Packaxera: 
 	openssl aes-256-ecb -e -in $(BINARIES_DIR)/u-boot.bin -out $(OUT_BINARIES_DIR)/u-boot_enc.bin -K 00000000000000000000000000000000 -nosalt -p
-	python3 $(SIGN_SCRIPT) -i $(BINARIES_DIR)/u-boot.bin \
-		-o $(OUT_BINARIES_DIR)/u-boot_signed.bin -ob $(OUT_BINARIES_DIR)/uboot_bk.bin -pub $(PUB_KEY) -prv $(PRIV_KEY) \
-		-fw $(AXERA_TOOL_DIR)/imgsign/eip.bin  $(SIGN_PARAMS)
+	python3 $(AXERA_TOOLS_SIGN_SCRIPT_650_BK) -i $(BINARIES_DIR)/u-boot.bin \
+		-o $(OUT_BINARIES_DIR)/u-boot_signed.bin -ob $(OUT_BINARIES_DIR)/uboot_bk.bin -pub $(AXERA_TOOLS_PUB_KEY) -prv $(AXERA_TOOLS_PRIV_KEY) \
+		-fw $(AXERA_TOOLS_PATH)/imgsign/eip.bin  $(AXERA_TOOLS_SIGN_PARAMS_650_UBOOT)
 
-	python3 $(SIGN_SCRIPT) -i $(OUT_BINARIES_DIR)/u-boot_enc.bin \
-		-o $(OUT_BINARIES_DIR)/u-boot_enc_signed.bin -ob $(OUT_BINARIES_DIR)/uboot_enc_bk.bin -pub $(PUB_KEY) -prv $(PRIV_KEY) \
-		-fw $(AXERA_TOOL_DIR)/imgsign/eip.bin  $(SIGN_PARAMS)
+	python3 $(AXERA_TOOLS_SIGN_SCRIPT_650_BK) -i $(OUT_BINARIES_DIR)/u-boot_enc.bin \
+		-o $(OUT_BINARIES_DIR)/u-boot_enc_signed.bin -ob $(OUT_BINARIES_DIR)/uboot_enc_bk.bin -pub $(AXERA_TOOLS_PUB_KEY) -prv $(AXERA_TOOLS_PRIV_KEY) \
+		-fw $(AXERA_TOOLS_PATH)/imgsign/eip.bin  $(AXERA_TOOLS_SIGN_PARAMS_650_UBOOT)
 
-	python3 $(SIGN_SCRIPT1) -i $(BINARIES_DIR)/u-boot.bin \
-		-o $(OUT_BINARIES_DIR)/fdl2_signed.bin -pub $(PUB_KEY) -prv $(PRIV_KEY) \
-		-fw $(AXERA_TOOL_DIR)/imgsign/eip.bin  $(SIGN_PARAMS)
+	python3 $(AXERA_TOOLS_SIGN_SCRIPT_650_FDL) -i $(BINARIES_DIR)/u-boot.bin \
+		-o $(OUT_BINARIES_DIR)/fdl2_signed.bin -pub $(AXERA_TOOLS_PUB_KEY) -prv $(AXERA_TOOLS_PRIV_KEY) \
+		-fw $(AXERA_TOOLS_PATH)/imgsign/eip.bin  $(AXERA_TOOLS_SIGN_PARAMS_650_UBOOT)
 
 linux-distclean:
 	@$(KERNEL_MAKE) distclean

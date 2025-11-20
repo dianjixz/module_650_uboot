@@ -4201,10 +4201,10 @@ index 00000000..a65ddc52
 +}
 diff --git a/arch/arm/mach-axera/ax650/chip_config.c b/arch/arm/mach-axera/ax650/chip_config.c
 new file mode 100644
-index 00000000..3bfa65e7
+index 00000000..0ef38e79
 --- /dev/null
 +++ b/arch/arm/mach-axera/ax650/chip_config.c
-@@ -0,0 +1,370 @@
+@@ -0,0 +1,369 @@
 +#include <common.h>
 +#include <dm.h>
 +#include <dm/pinctrl.h>
@@ -4488,7 +4488,6 @@ index 00000000..3bfa65e7
 +{
 +#ifdef CONFIG_PWM_AXERA
 +
-+	board_type_t board_id = get_board_id();
 +	/* PWM clock set */
 +	pwm_clk_config();
 +	/*
@@ -4518,7 +4517,7 @@ index 00000000..3bfa65e7
 +		NPU settings ,frequence is 240KHZ, duty is 50%, Vout is 0.6V
 +		use PWM01 generate PWM signal.
 +	*/
-+	if (board_id == AX650A_Demo)
++	if (get_chip_type_id() == AX650A_CHIP)
 +		pwm_config(type, NNVDD, 240, 62);
 +	else
 +		pwm_config(type, NNVDD, 240, 60);
@@ -4575,7 +4574,6 @@ index 00000000..3bfa65e7
 +	ddr_init();
 +	return 0;
 +}
-\ No newline at end of file
 diff --git a/arch/arm/mach-axera/ax650/common/Makefile b/arch/arm/mach-axera/ax650/common/Makefile
 new file mode 100644
 index 00000000..174e841e
@@ -16584,10 +16582,10 @@ index 00000000..861cedcb
 +obj-$(CONFIG_CMD_AXERA_USB_STOR_UPDATE) += usb_stor_update/usb_storage_update.o
 diff --git a/cmd/axera/boot/axera_boot.c b/cmd/axera/boot/axera_boot.c
 new file mode 100644
-index 00000000..8233a751
+index 00000000..272e7995
 --- /dev/null
 +++ b/cmd/axera/boot/axera_boot.c
-@@ -0,0 +1,1375 @@
+@@ -0,0 +1,1374 @@
 +/*
 + * AXERA AX650X Host Controller Interface
 + *
@@ -17747,8 +17745,7 @@ index 00000000..8233a751
 +#ifdef CONFIG_VIDEO_AXERA
 +	extern void fdt_fixup_logo_info(int dev, u64 addr, u64 size, void *fdt);
 +
-+	if (AX650N_CHIP == get_chip_type_id())
-+		fdt_fixup_logo_info(LOGO_SHOW_DEVID, LOGO_SHOW_BUFFER, LOGO_SHOW_BUF_SIZE, atf_boot_images.ft_addr);
++	fdt_fixup_logo_info(LOGO_SHOW_DEVID, LOGO_SHOW_BUFFER, LOGO_SHOW_BUF_SIZE, atf_boot_images.ft_addr);
 +#endif
 +	if (atf_boot_images.ft_addr != dtb_addr) {
 +		printf("moving dtb image from 0x%lx to 0x%lx, fdt_totalsize:%u\n",
@@ -42691,10 +42688,10 @@ index 00000000..a5a39ee6
 +CONFIG_BOOTDELAY=0
 diff --git a/configs/AX650_emmc_defconfig b/configs/AX650_emmc_defconfig
 new file mode 100644
-index 00000000..f205770e
+index 00000000..e8724ae4
 --- /dev/null
 +++ b/configs/AX650_emmc_defconfig
-@@ -0,0 +1,153 @@
+@@ -0,0 +1,154 @@
 +CONFIG_ARM=y
 +CONFIG_ARCH_AXERA=y
 +CONFIG_SYS_TEXT_BASE=0x14001000
@@ -42812,6 +42809,7 @@ index 00000000..f205770e
 +### below for boot logo###
 +CONFIG_DM_VIDEO=y
 +CONFIG_DISPLAY=y
++CONFIG_VIDEO_MIPI_DSI=y
 +CONFIG_VIDEO_AXERA=y
 +### above for boot logo ###
 +# adc #
@@ -42971,10 +42969,10 @@ index 00000000..a56c7982
 +CONFIG_AX650_DRAM=y
 diff --git a/configs/AX650_lp_defconfig b/configs/AX650_lp_defconfig
 new file mode 100644
-index 00000000..f89a81b8
+index 00000000..003e4ad8
 --- /dev/null
 +++ b/configs/AX650_lp_defconfig
-@@ -0,0 +1,153 @@
+@@ -0,0 +1,154 @@
 +CONFIG_ARM=y
 +CONFIG_ARCH_AXERA=y
 +CONFIG_SYS_TEXT_BASE=0x14001000
@@ -43092,6 +43090,7 @@ index 00000000..f89a81b8
 +### below for boot logo###
 +CONFIG_DM_VIDEO=y
 +CONFIG_DISPLAY=y
++CONFIG_VIDEO_MIPI_DSI=y
 +CONFIG_VIDEO_AXERA=y
 +### above for boot logo ###
 +# adc #
@@ -43275,10 +43274,10 @@ index 00000000..5d89e2e0
 +CONFIG_CMD_USB=y
 diff --git a/configs/AX650_pipro_box_defconfig b/configs/AX650_pipro_box_defconfig
 new file mode 100644
-index 00000000..e27affc3
+index 00000000..2a33d7fb
 --- /dev/null
 +++ b/configs/AX650_pipro_box_defconfig
-@@ -0,0 +1,153 @@
+@@ -0,0 +1,154 @@
 +CONFIG_ARM=y
 +CONFIG_ARCH_AXERA=y
 +CONFIG_SYS_TEXT_BASE=0x14001000
@@ -43396,6 +43395,7 @@ index 00000000..e27affc3
 +### below for boot logo###
 +CONFIG_DM_VIDEO=y
 +CONFIG_DISPLAY=y
++CONFIG_VIDEO_MIPI_DSI=y
 +CONFIG_VIDEO_AXERA=y
 +### above for boot logo ###
 +# adc #
@@ -43578,10 +43578,10 @@ index 00000000..46e32ef2
 +CONFIG_CMD_USB=y
 diff --git a/configs/AX650_ssd_defconfig b/configs/AX650_ssd_defconfig
 new file mode 100644
-index 00000000..d03fb3f2
+index 00000000..3ae5f556
 --- /dev/null
 +++ b/configs/AX650_ssd_defconfig
-@@ -0,0 +1,172 @@
+@@ -0,0 +1,173 @@
 +CONFIG_ARM=y
 +CONFIG_ARCH_AXERA=y
 +CONFIG_SYS_TEXT_BASE=0x14001000
@@ -43707,6 +43707,7 @@ index 00000000..d03fb3f2
 +### below for boot logo###
 +CONFIG_DM_VIDEO=y
 +CONFIG_DISPLAY=y
++CONFIG_VIDEO_MIPI_DSI=y
 +CONFIG_VIDEO_AXERA=y
 +### above for boot logo ###
 +# adc #
@@ -43756,10 +43757,10 @@ index 00000000..d03fb3f2
 +CONFIG_AXERA_MEMORY_FIREWALL=y
 diff --git a/configs/AX650_xpilot_6v_defconfig b/configs/AX650_xpilot_6v_defconfig
 new file mode 100644
-index 00000000..63c3db2f
+index 00000000..7b3212f0
 --- /dev/null
 +++ b/configs/AX650_xpilot_6v_defconfig
-@@ -0,0 +1,118 @@
+@@ -0,0 +1,119 @@
 +CONFIG_ARM=y
 +CONFIG_POSITION_INDEPENDENT=y
 +CONFIG_ARCH_AXERA=y
@@ -43870,6 +43871,7 @@ index 00000000..63c3db2f
 +CONFIG_USB_STORAGE=y
 +CONFIG_DM_VIDEO=y
 +CONFIG_DISPLAY=y
++CONFIG_VIDEO_MIPI_DSI=y
 +CONFIG_VIDEO_AXERA=y
 +CONFIG_FAT_WRITE=y
 +CONFIG_ERRNO_STR=y
@@ -244992,11 +244994,13 @@ index 00000000..9175cb18
 +endif
 diff --git a/drivers/video/axera/Makefile b/drivers/video/axera/Makefile
 new file mode 100755
-index 00000000..3125d18c
+index 00000000..4d308f64
 --- /dev/null
 +++ b/drivers/video/axera/Makefile
-@@ -0,0 +1,9 @@
+@@ -0,0 +1,12 @@
 +ifdef CONFIG_VIDEO_AXERA
++obj-y += dw_mipi_dsi.o
++obj-y += ax_dw_mipi_dsi.o
 +obj-y += dw_hdmi.o
 +obj-y += ax_dw_hdmi.o
 +obj-y += ax_vo.o
@@ -245004,13 +245008,14 @@ index 00000000..3125d18c
 +obj-y += ax650_vo.o
 +obj-y += ax650_mm_ck.o
 +obj-y += ax_simple_logo.o
++obj-y += ax_simple_logo_cfg.o
 +endif
 diff --git a/drivers/video/axera/ax650_mm_ck.c b/drivers/video/axera/ax650_mm_ck.c
 new file mode 100644
-index 00000000..dc907a73
+index 00000000..34386b95
 --- /dev/null
 +++ b/drivers/video/axera/ax650_mm_ck.c
-@@ -0,0 +1,320 @@
+@@ -0,0 +1,328 @@
 +/**************************************************************************************************
 + *
 + * Copyright (c) 2019-2024 Axera Semiconductor Co., Ltd. All Rights Reserved.
@@ -245045,7 +245050,7 @@ index 00000000..dc907a73
 +
 +#define CLK_DIV_0				0xC
 +#define CLK_MUX_0_DPU_DIVN_BIT(ID)		(0 + (ID) * 5)
-+#define CLK_MUX_0_DPU_DIVN_MASK			(0xF)
++#define CLK_MUX_0_DPU_DIVN_MASK			(0x1F)
 +#define CLK_MUX_0_DPU_DIVN_UPDATE_BIT(ID)	(4 + (ID) * 5)
 +#define CLK_MUX_0_DPU_DIVN_UPDATE_MASK		(0x1)
 +
@@ -245080,6 +245085,7 @@ index 00000000..dc907a73
 +#define CLK_DIV_NUM 16
 +
 +void __iomem *mm_ck_regs = (void __iomem *)MM_CK_BASE_ADDR;
++void __iomem *mm_phy_ck_rst_regs = (void __iomem *)MM_PHY_CK_RST_BASE_ADDR;
 +void __iomem *pllc_regs = (void __iomem *)AON_SYS_PLL_BASE_ADDR;
 +
 +#define GRP_PLL_RE_OPEN		0x478
@@ -245097,8 +245103,8 @@ index 00000000..dc907a73
 +#define PLLC_CLR_OFFS		0x8
 +
 +#define VPLL_REF_FREQ		27000000
-+#define VPLL_MIN_RATE		600000000
-+#define VPLL_MAX_RATE		1188000000
++#define VPLL_MIN_RATE		600000000U
++#define VPLL_MAX_RATE		1850000000U
 +#define VPLL_CUR_RATE		(VPLL_MAX_RATE)
 +
 +#define ON_BIT_OFF		0
@@ -245155,45 +245161,46 @@ index 00000000..dc907a73
 +	},
 +};
 +
-+static void vpll_set(u32 id, u32 rate)
++static int vpll_set(u32 id, u32 rate)
 +{
 +	int i = 0, val, try_count = 10000;
-+	u32 pre_div = 1, fbk_fra, ldo_stb_x2_en;
++	u32 pre_div, fbk_fra, ldo_stb_x2_en;
 +	u32 fbk_int = rate << 1;
 +	u32 pfd_rate;
 +	struct vpll_cfg *cfg;
 +
 +	if (id > 1) {
 +		VO_ERROR("id(%d) invalid\n", id);
-+		return;
++		return -EINVAL;
 +	}
 +
 +	cfg = &vpll_cfg_array[id];
 +
 +	if ((rate < cfg->min_rate) || (rate > cfg->max_rate)) {
-+		VO_ERROR("vo%d rate(%d) out of range, valid range:[%d,%d]\n", id, rate, cfg->min_rate, rate > cfg->max_rate);
-+		return;
++		VO_ERROR("vo%d rate(%d) out of range:[%d,%d]\n", id, rate, cfg->min_rate, cfg->max_rate);
++		return -EINVAL;
 +	}
 +
 +	if (cfg->cur_rate != rate) {
 +		cfg->cur_rate = rate;
 +	} else {
 +		VO_INFO("vpll%d rate(%d) is configured\n", id, cfg->cur_rate);
-+		return;
++		return 0;
 +	}
++
++	pre_div = 0;
++	if (fbk_int % cfg->ref_rate)
++		pre_div = 0;
++	else if (fbk_int % (cfg->ref_rate >> 1))
++		pre_div = 1;
 +
 +	pfd_rate = cfg->ref_rate >> pre_div;
-+	if (fbk_int % pfd_rate) {
-+		pre_div = 0;
-+		pfd_rate = cfg->ref_rate >> pre_div;
-+	}
-+
++	fbk_fra = do_div(fbk_int, pfd_rate);
++	fbk_fra = ((u64)fbk_fra * (1 << 24) + pfd_rate / 2) / pfd_rate;
 +	ldo_stb_x2_en = (pfd_rate < 20000000) ? 0 : 1;
 +
-+	fbk_fra = do_div(fbk_int, cfg->ref_rate);
-+	fbk_fra = ((u64)fbk_fra * (1 << 24) + pfd_rate / 2) / pfd_rate;
-+
-+	VO_INFO("vpll%d fbk_int:%d, fbk_fra:%d, pfd_rate:%d\n", id, fbk_int, fbk_fra, pfd_rate);
++	VO_INFO("vpll%d fbk_int:%d, fbk_fra:%d, pfd_rate:%d, pre_div:%d\n", id,
++		fbk_int, fbk_fra, pfd_rate, pre_div);
 +
 +	/* re_open set to 0 */
 +	vo_writel(pllc_regs, cfg->re_open_reg + PLLC_CLR_OFFS, (1 << cfg->re_open_bit));
@@ -245236,10 +245243,13 @@ index 00000000..dc907a73
 +
 +	/*re_open set to 1 */
 +	vo_writel(pllc_regs, cfg->re_open_reg + PLLC_SET_OFFS, (1 << cfg->re_open_bit));
++
++	return 0;
 +}
 +
 +int ax650_pixel_clk_set(u32 id, u32 clk)
 +{
++	int ret;
 +	int i, j, found = 0;
 +	u32 sel, div, rate = VPLL_MAX_RATE;
 +	u32 pre_div, post_div;
@@ -245265,13 +245275,13 @@ index 00000000..dc907a73
 +	if (found)
 +		goto skip;
 +
-+	for (i = SRC_CLK_NUM - 1; i >= 0; i -= 1) {
++	for (i = SRC_CLK_NUM - 1; (!found && (i >= 0)); i -= 1) {
 +		pre_div = pre_divs[i];
 +
 +		for (j = 0; j < CLK_DIV_NUM; j += 1) {
 +			post_div = (j == 0) ? 1 : (j << 1);
 +			rate = clk * post_div * pre_div;
-+			if (rate >= VPLL_MIN_RATE) {
++			if ((rate >= VPLL_MIN_RATE) && (rate <= VPLL_MAX_RATE)) {
 +				sel = i;
 +				div = post_div;
 +				found = 1;
@@ -245284,7 +245294,9 @@ index 00000000..dc907a73
 +	if (found) {
 +		VO_INFO("vo%d sel:%d, div:%d, rate:%d\n", id, sel, div, rate);
 +
-+		vpll_set(id, rate);
++		ret = vpll_set(id, rate);
++		if (ret)
++			return ret;
 +
 +		div = (div == 1) ? (div - 1) : (div >> 1);
 +		sel = ((id == 0) && (sel == 3)) ? (sel + 1) : sel;
@@ -245295,7 +245307,6 @@ index 00000000..dc907a73
 +		vo_writel(mm_ck_regs, CLK_DIV_0_CLR, CLK_MUX_0_DPU_DIVN_MASK << CLK_MUX_0_DPU_DIVN_BIT(id));
 +		vo_writel(mm_ck_regs, CLK_DIV_0_SET, (CLK_MUX_0_DPU_DIVN_UPDATE_MASK << CLK_MUX_0_DPU_DIVN_UPDATE_BIT(id)) |
 +			  (div << CLK_MUX_0_DPU_DIVN_BIT(id)));
-+		vo_writel(mm_ck_regs, CLK_DIV_0_CLR, CLK_MUX_0_DPU_DIVN_UPDATE_MASK << CLK_MUX_0_DPU_DIVN_UPDATE_BIT(id));
 +	}
 +
 +	return found ? 0 : -EINVAL;
@@ -245319,6 +245330,8 @@ index 00000000..dc907a73
 +
 +	vo_writel(mm_ck_regs, CLK_EB_1_SET, 0x1 << PCLK_DSITX_EB_BIT);
 +	vo_writel(mm_ck_regs, CLK_EB_1_SET, 0x1 << CLK_HDMI_VIDEO_EB_BIT(id));
++
++	vo_writel(mm_phy_ck_rst_regs, 0x4, 0x1);
 +}
 +
 +void ax650_hdmi_reset(u32 id)
@@ -245358,10 +245371,10 @@ index 00000000..babee21b
 +#endif
 diff --git a/drivers/video/axera/ax650_vo.c b/drivers/video/axera/ax650_vo.c
 new file mode 100644
-index 00000000..99abd53a
+index 00000000..4f9486cf
 --- /dev/null
 +++ b/drivers/video/axera/ax650_vo.c
-@@ -0,0 +1,840 @@
+@@ -0,0 +1,835 @@
 +/**************************************************************************************************
 + *
 + * Copyright (c) 2019-2024 Axera Semiconductor Co., Ltd. All Rights Reserved.
@@ -245526,11 +245539,6 @@ index 00000000..99abd53a
 +
 +	if (mode->flags & MODE_FLAG_INTERLACE)
 +		vo_writel(hdev->regs, DPU_DISP_VTOTAL, !(mode->vtotal & 1));
-+
-+	if (mode->type == AX_DISP_OUT_MODE_DSI_VIDEO || mode->type == AX_DISP_OUT_MODE_HDMI) {
-+		hp_pol = !hp_pol;
-+		vp_pol = !vp_pol;
-+	}
 +
 +	vo_writel(hdev->regs, DPU_DISP_POLAR, de_pol << 2 | hp_pol << 1 | vp_pol);
 +}
@@ -247307,10 +247315,10 @@ index 00000000..a31e6896
 +#endif /* __AX_REG_VO_H */
 diff --git a/drivers/video/axera/ax_dw_hdmi.c b/drivers/video/axera/ax_dw_hdmi.c
 new file mode 100644
-index 00000000..aab69924
+index 00000000..e891b883
 --- /dev/null
 +++ b/drivers/video/axera/ax_dw_hdmi.c
-@@ -0,0 +1,284 @@
+@@ -0,0 +1,286 @@
 +/**************************************************************************************************
 + *
 + * Copyright (c) 2019-2024 Axera Semiconductor Co., Ltd. All Rights Reserved.
@@ -247329,7 +247337,7 @@ index 00000000..aab69924
 +
 +static struct dw_hdmi ax_dw_hdmi[HDMI_DEV_NR] = {
 +	{.ioaddr = (ulong)AX_DW_HDMI0_BASE_ADDR},
-+	{.ioaddr = (ulong)AX_VO_HDMI1_BASE_ADDR},
++	{.ioaddr = (ulong)AX_DW_HDMI1_BASE_ADDR},
 +};
 +
 +static const struct hdmi_phy_config axera_phy_config[] = {
@@ -247564,7 +247572,7 @@ index 00000000..aab69924
 +	hdmi->phy_mask = (u8) ~(HDMI_PHY_HPD | HDMI_PHY_RX_SENSE);
 +}
 +
-+int ax_dw_hdmi_init(u32 devid)
++int ax_dw_hdmi_init(u32 devid, struct display_timing *timing, struct display_timing *adjusted_timing, void *data)
 +{
 +	int ret;
 +	struct dw_hdmi *hdmi;
@@ -247590,6 +247598,8 @@ index 00000000..aab69924
 +	dw_hdmi_init(hdmi);
 +	dw_hdmi_phy_init(hdmi);
 +
++	adjusted_timing->flags = DISPLAY_FLAGS_HSYNC_HIGH | DISPLAY_FLAGS_VSYNC_HIGH | DISPLAY_FLAGS_DE_HIGH;
++
 +	VO_DEBUG("hdmi%d init success\n", devid);
 +
 +	return 0;
@@ -247597,7 +247607,7 @@ index 00000000..aab69924
 +
 diff --git a/drivers/video/axera/ax_dw_hdmi.h b/drivers/video/axera/ax_dw_hdmi.h
 new file mode 100644
-index 00000000..0540a47a
+index 00000000..1ba7e1eb
 --- /dev/null
 +++ b/drivers/video/axera/ax_dw_hdmi.h
 @@ -0,0 +1,19 @@
@@ -247614,18 +247624,550 @@ index 00000000..0540a47a
 +#ifndef __AX_DW_HDMI_H__
 +#define __AX_DW_HDMI_H__
 +
-+int ax_dw_hdmi_init(u32 devid);
++int ax_dw_hdmi_init(u32 devid, struct display_timing *timing, struct display_timing *adjusted_timing, void *data);
 +int ax_dw_hdmi_read_edid(u32 devid, u8 *buf, int buf_size);
 +int ax_dw_hdmi_enable(u32 devid, const struct display_timing *edid);
 +
 +#endif
 +
+diff --git a/drivers/video/axera/ax_dw_mipi_dsi.c b/drivers/video/axera/ax_dw_mipi_dsi.c
+new file mode 100644
+index 00000000..25f475d3
+--- /dev/null
++++ b/drivers/video/axera/ax_dw_mipi_dsi.c
+@@ -0,0 +1,502 @@
++/**************************************************************************************************
++ *
++ * Copyright (c) 2019-2024 Axera Semiconductor Co., Ltd. All Rights Reserved.
++ *
++ * This source file is the property of Axera Semiconductor Co., Ltd. and
++ * may not be copied or distributed in any isomorphic form without the prior
++ * written consent of Axera Semiconductor Co., Ltd.
++ *
++ **************************************************************************************************/
++
++#include <common.h>
++#include <div64.h>
++#include <media_bus_format.h>
++
++#include "dw_mipi_dsi.h"
++#include "ax_vo_common.h"
++
++#define USEC_PER_SEC			1000000L
++
++#define LONG_PKT_OVERHEAD		6
++
++#define SET_OFFS			0x4
++#define CLR_OFFS			0x8
++
++/* Defines the offset of the dphy register */
++#define DPHYTX_BASE_DIR_0		0x10
++#define DPHYTX_TURN_DISABLE_0		0x1C
++#define DPHYTX_FORCE_RX_MODE_0		0x28
++#define DPHYTX_FORCE_TX_STOP_MODE_0	0x34
++#define DPHYTX_FORCE_TX_STOP_MODE_1	0x40
++#define DPHYTX_FORCE_TX_STOP_MODE_2	0x4C
++#define DPHYTX_FORCE_TX_STOP_MODE_3	0x58
++
++#define DPHYTX_CFG_CLK_FREQ_RANGE	0x64
++#define CFG_CLK_RANGE(val)		(((val) & 0x3F) << 0)
++
++#define DPHYTX_HS_CLK_FREQ_RANGE	0x70
++#define HS_CLK_RANGE(val)		(((val) & 0x7F) << 0)
++
++#define DPHYTX_PLL_CFG0			0x7C
++#define PLL_INT_CTRL(val)		(((val) & 0x3F) << 14)
++#define PLL_GP_CLK_EN(val)		(((val) & 0x1) << 13)
++#define PLL_GMP_CTRL(val)		(((val) & 0x3) << 11)
++#define PLL_FORCE_LOCK(val)		(((val) & 0x1) << 10)
++#define PLL_CPBIAS_CTRL(val)		(((val) & 0x7F) << 3)
++#define PLL_CLK_SEL(val)		(((val) & 0x3) << 1)
++#define PLL_CLK_EXT(val)		(((val) & 0x1) << 0)
++
++#define DPHYTX_PLL_CFG1			0x88
++#define PLL_VCO_CTRL(val)		(((val) & 0x3F) << 23)
++#define PLL_UPDATE_PLL(val)		(((val) & 0x1) << 22)
++#define PLL_SHADOW_CLR(val)		(((val) & 0x1) << 21)
++#define PLL_PROP_CTRL(val)		(((val) & 0x3F) << 15)
++#define PLL_SHADOW_CTRL(val)		(((val) & 0x1) << 14)
++#define PLL_N(val)			(((val) & 0xF) << 10)
++#define PLL_M(val)			(((val) & 0x3FF) << 0)
++
++#define DPHYTX_PLL_OBS0			0x94
++#define DPHYTX_PLL_OBS1			0x98
++
++struct hs_transition_times {
++	u32 max_freq;
++	u32 hs_freq_range;
++	struct dw_mipi_dsi_dphy_timing timing;
++};
++
++#define HSTT(_maxfreq, _range, _c_lp2hs, _c_hs2lp, _d_lp2hs, _d_hs2lp)	\
++{					\
++	.max_freq = _maxfreq,		\
++	.hs_freq_range = _range,	\
++	.timing = {			\
++		.clk_lp2hs = _c_lp2hs,	\
++		.clk_hs2lp = _c_hs2lp,	\
++		.data_lp2hs = _d_lp2hs,	\
++		.data_hs2lp = _d_hs2lp,	\
++	}				\
++}
++
++struct pll_parameter {
++	u32 max_freq;
++	u32 actual_freq;
++	u16 cfg_freq_range;
++	u16 hs_freq_range;
++	u16 pll_n;
++	u16 pll_m;
++	u8 vco_cntrl;
++	u8 cpbias_cntrl;
++	u8 gmp_cntrl;
++	u8 int_cntrl;
++	u8 prop_cntrl;
++};
++
++#define PLL_PARAM(_maxfreq, _vco_ctl, _cpbias_ctl, _gmp_ctl, _int_ctl, _prop_ctl) \
++{					\
++	.max_freq = _maxfreq,		\
++	.vco_cntrl = _vco_ctl,		\
++	.cpbias_cntrl = _cpbias_ctl,	\
++	.gmp_cntrl = _gmp_ctl,		\
++	.int_cntrl = _int_ctl,		\
++	.prop_cntrl = _prop_ctl,	\
++}
++
++struct ax_mipi_dsi {
++	unsigned max_data_lanes;
++	unsigned pll_ref_clk;
++	unsigned burst_factor;
++
++	struct dw_mipi_dsi dw_dsi;
++	struct mipi_dsi_device dsi_device;
++
++	struct pll_parameter pll_param;
++	const struct mipi_dsi_phy_ops phy_ops;
++
++	void __iomem *mm_sys_base;
++	void __iomem *dphy_base;
++};
++
++static inline void dphy_write(struct ax_mipi_dsi *dsi, u32 reg, u32 val)
++{
++	writel(val, dsi->dphy_base + reg);
++}
++
++static inline u32 dsi_read(struct ax_mipi_dsi *dsi, u32 reg)
++{
++	return readl(dsi->dphy_base + reg);
++}
++
++/* Table A-4 High-Speed Transition Times */
++static struct hs_transition_times hstt_table[] = {
++	HSTT(80, 0x00, 21, 17, 15, 10),
++	HSTT(90, 0x10, 23, 17, 16, 10),
++	HSTT(100, 0x20, 22, 17, 16, 10),
++	HSTT(110, 0x30, 25, 18, 17, 11),
++	HSTT(120, 0x01, 26, 20, 18, 11),
++	HSTT(130, 0x11, 27, 19, 19, 11),
++	HSTT(140, 0x21, 27, 19, 19, 11),
++	HSTT(150, 0x31, 28, 20, 20, 12),
++	HSTT(160, 0x02, 30, 21, 22, 13),
++	HSTT(170, 0x12, 30, 21, 23, 13),
++	HSTT(180, 0x22, 31, 21, 23, 13),
++	HSTT(190, 0x32, 32, 22, 24, 13),
++	HSTT(205, 0x03, 35, 22, 25, 13),
++	HSTT(220, 0x13, 37, 26, 27, 15),
++	HSTT(235, 0x23, 38, 28, 27, 16),
++	HSTT(250, 0x33, 41, 29, 30, 17),
++	HSTT(275, 0x04, 43, 29, 32, 18),
++	HSTT(300, 0x14, 45, 32, 35, 19),
++	HSTT(325, 0x25, 48, 33, 36, 18),
++	HSTT(350, 0x35, 51, 35, 40, 20),
++	HSTT(400, 0x05, 59, 37, 44, 21),
++	HSTT(450, 0x16, 65, 40, 49, 23),
++	HSTT(500, 0x26, 71, 41, 54, 24),
++	HSTT(550, 0x37, 77, 44, 57, 26),
++	HSTT(600, 0x07, 82, 46, 64, 27),
++	HSTT(650, 0x18, 87, 48, 67, 28),
++	HSTT(700, 0x28, 94, 52, 71, 29),
++	HSTT(750, 0x39, 99, 52, 75, 31),
++	HSTT(800, 0x09, 105, 55, 82, 32),
++	HSTT(850, 0x19, 110, 58, 85, 32),
++	HSTT(900, 0x29, 115, 58, 88, 35),
++	HSTT(950, 0x3A, 120, 62, 93, 36),
++	HSTT(1000, 0x0A, 128, 63, 99, 38),
++	HSTT(1050, 0x1A, 132, 65, 102, 38),
++	HSTT(1100, 0x2A, 138, 67, 106, 39),
++	HSTT(1150, 0x3B, 146, 69, 112, 42),
++	HSTT(1200, 0x0B, 151, 71, 117, 43),
++	HSTT(1250, 0x1B, 153, 74, 120, 45),
++	HSTT(1300, 0x2B, 160, 73, 124, 46),
++	HSTT(1350, 0x3C, 165, 76, 130, 47),
++	HSTT(1400, 0x0C, 172, 78, 134, 49),
++	HSTT(1450, 0x1C, 177, 80, 138, 49),
++	HSTT(1500, 0x2C, 183, 81, 143, 52),
++	HSTT(1550, 0x3D, 191, 84, 147, 52),
++	HSTT(1600, 0x0D, 194, 85, 152, 52),
++	HSTT(1650, 0x1D, 201, 86, 155, 53),
++	HSTT(1700, 0x2E, 208, 88, 161, 53),
++	HSTT(1750, 0x3E, 212, 89, 165, 53),
++	HSTT(1800, 0x0E, 220, 90, 171, 54),
++	HSTT(1850, 0x1E, 223, 92, 175, 54),
++	HSTT(1900, 0x2F, 231, 91, 180, 55),
++	HSTT(1950, 0x3F, 236, 95, 185, 56),
++	HSTT(2000, 0x0F, 243, 97, 190, 56),
++	HSTT(2050, 0x40, 248, 99, 194, 58),
++	HSTT(2100, 0x41, 252, 100, 199, 59),
++	HSTT(2150, 0x42, 259, 102, 204, 61),
++	HSTT(2200, 0x43, 266, 105, 210, 62),
++	HSTT(2250, 0x44, 269, 109, 213, 63),
++	HSTT(2300, 0x45, 272, 109, 217, 65),
++	HSTT(2350, 0x46, 281, 112, 225, 66),
++	HSTT(2400, 0x47, 283, 115, 226, 66),
++	HSTT(2450, 0x48, 282, 115, 226, 67),
++	HSTT(2500, 0x49, 281, 118, 227, 67),
++};
++
++/* Table 3-13 Charge-pump Programmability */
++struct pll_parameter pp_table[] = {
++	PLL_PARAM(55, 0x3f, 0x10, 0x00, 0x00, 0x08),
++	PLL_PARAM(82, 0x37, 0x10, 0x00, 0x00, 0x08),
++	PLL_PARAM(110, 0x2f, 0x10, 0x00, 0x00, 0x08),
++	PLL_PARAM(165, 0x27, 0x10, 0x00, 0x00, 0x08),
++	PLL_PARAM(220, 0x1f, 0x10, 0x00, 0x00, 0x08),
++	PLL_PARAM(330, 0x17, 0x10, 0x00, 0x00, 0x08),
++	PLL_PARAM(440, 0x0f, 0x10, 0x00, 0x00, 0x08),
++	PLL_PARAM(660, 0x07, 0x10, 0x00, 0x00, 0x08),
++	PLL_PARAM(1149, 0x03, 0x10, 0x00, 0x00, 0x08),
++	PLL_PARAM(1152, 0x01, 0x10, 0x00, 0x00, 0x08),
++	PLL_PARAM(1250, 0x01, 0x10, 0x00, 0x00, 0x09),
++};
++
++static int dphy_init(void *priv_data)
++{
++	u32 val;
++	struct mipi_dsi_device *dsi_device = priv_data;
++	struct ax_mipi_dsi *dsi = container_of(dsi_device, struct ax_mipi_dsi, dsi_device);
++	struct pll_parameter *pll_param = &dsi->pll_param;
++
++	dphy_write(dsi, DPHYTX_BASE_DIR_0 + CLR_OFFS, 0x1);
++	dphy_write(dsi, DPHYTX_TURN_DISABLE_0 + CLR_OFFS, 0x1);
++	dphy_write(dsi, DPHYTX_FORCE_RX_MODE_0 + CLR_OFFS, 0x1);
++	dphy_write(dsi, DPHYTX_FORCE_TX_STOP_MODE_0 + CLR_OFFS, 0x1);
++	dphy_write(dsi, DPHYTX_FORCE_TX_STOP_MODE_1 + CLR_OFFS, 0x1);
++	dphy_write(dsi, DPHYTX_FORCE_TX_STOP_MODE_2 + CLR_OFFS, 0x1);
++	dphy_write(dsi, DPHYTX_FORCE_TX_STOP_MODE_3 + CLR_OFFS, 0x1);
++	dphy_write(dsi, DPHYTX_CFG_CLK_FREQ_RANGE + CLR_OFFS, ~0x0);
++	dphy_write(dsi, DPHYTX_HS_CLK_FREQ_RANGE + CLR_OFFS, ~0x0);
++	dphy_write(dsi, DPHYTX_PLL_CFG0 + CLR_OFFS, ~0x0);
++	dphy_write(dsi, DPHYTX_PLL_CFG1 + CLR_OFFS, ~0x0);
++
++	dphy_write(dsi, DPHYTX_CFG_CLK_FREQ_RANGE + SET_OFFS, CFG_CLK_RANGE(pll_param->cfg_freq_range));
++	dphy_write(dsi, DPHYTX_HS_CLK_FREQ_RANGE + SET_OFFS, HS_CLK_RANGE(pll_param->hs_freq_range));
++
++	dphy_write(dsi, DPHYTX_PLL_CFG1 + CLR_OFFS, PLL_SHADOW_CTRL(0x1));
++	dphy_write(dsi, DPHYTX_PLL_CFG0 + SET_OFFS, PLL_CLK_SEL(0x1));
++	dphy_write(dsi, DPHYTX_PLL_CFG0 + CLR_OFFS, PLL_CLK_EXT(0x1));
++
++	dphy_write(dsi, DPHYTX_PLL_CFG1 + SET_OFFS, PLL_SHADOW_CLR(0x1));
++	udelay(1);
++	dphy_write(dsi, DPHYTX_PLL_CFG1 + CLR_OFFS, PLL_SHADOW_CLR(0x1));
++
++	val = PLL_INT_CTRL(pll_param->int_cntrl) | PLL_GP_CLK_EN(0x1) |
++	      PLL_GMP_CTRL(pll_param->gmp_cntrl) | PLL_CPBIAS_CTRL(pll_param->cpbias_cntrl);
++	dphy_write(dsi, DPHYTX_PLL_CFG0 + SET_OFFS, val);
++
++	val = PLL_VCO_CTRL(pll_param->vco_cntrl) | PLL_PROP_CTRL(pll_param->prop_cntrl) |
++	      PLL_N(pll_param->pll_n) | PLL_M(pll_param->pll_m);
++	dphy_write(dsi, DPHYTX_PLL_CFG1 + SET_OFFS, val);
++
++	dphy_write(dsi, DPHYTX_PLL_CFG1 + SET_OFFS, PLL_UPDATE_PLL(0x1));
++	udelay(1);
++	dphy_write(dsi, DPHYTX_PLL_CFG1 + CLR_OFFS, PLL_UPDATE_PLL(0x1));
++
++	return 0;
++}
++
++static u32 dphy_get_hs_range(u32 max_freq)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(hstt_table); i++)
++		if (max_freq < hstt_table[i].max_freq * USEC_PER_SEC)
++			return hstt_table[i].hs_freq_range;
++
++	return 0;
++}
++
++static int dphy_get_pll_params(struct ax_mipi_dsi *dsi, u64 lane_bps)
++{
++	int i;
++	unsigned int min_prediv, max_prediv;
++	unsigned int _prediv0 = 1, _prediv, best_prediv = 0;
++	unsigned long best_freq = 0;
++	unsigned long fvco_min, fvco_max, fin, fout, fvco;
++	unsigned long f_multi, best_multi;
++	unsigned long min_delta = ULONG_MAX;
++	struct pll_parameter *pll_param = &dsi->pll_param;
++
++	fin = dsi->pll_ref_clk;
++	fout = lane_bps / 2;
++
++	VO_DEBUG("fin:%ld, fout:%ld, lane_bps:%lld\n", fin, fout, lane_bps);
++
++	/* constraint: 2Mhz <= Fref / N <= 8MHz */
++	min_prediv = DIV_ROUND_UP(fin, 8 * USEC_PER_SEC);
++	max_prediv = fin / (2 * USEC_PER_SEC);
++
++	/* constraint: 320MHz <= Fvco <= 1250Mhz */
++	fvco_min = 320 * USEC_PER_SEC;
++	fvco_max = 1250 * USEC_PER_SEC;
++
++	if (fout * 4 < fvco_min)
++		_prediv0 = 8;
++	else if (fout * 2 < fvco_min)
++		_prediv0 = 4;
++	else if (fout < fvco_min)
++		_prediv0 = 2;
++
++	fvco = fout * _prediv0;
++
++	for (_prediv = min_prediv; _prediv <= max_prediv; _prediv++) {
++		u64 tmp;
++		u32 delta;
++
++		/* Fvco = Fref * M / N */
++		tmp = (u64)fvco * _prediv;
++		f_multi = DIV_ROUND_UP(tmp, fin);
++
++		VO_DEBUG("f_multi:%lu, tmp:%llu, fvco:%lu, _prediv:%u\n",
++			 f_multi, tmp, fvco, _prediv);
++		/* M range */
++		if (f_multi < 64 || f_multi > 625)
++			continue;
++
++		tmp = (u64)f_multi * fin;
++		do_div(tmp, _prediv);
++		if (tmp < fvco_min || tmp > fvco_max || ((tmp % 500000) != 0)) {
++			VO_DEBUG("invalid fvco(%llu)\n", tmp);
++			continue;
++		}
++
++		delta = abs(fvco - tmp);
++		if (delta < min_delta) {
++			best_prediv = _prediv;
++			best_multi = f_multi;
++			min_delta = delta;
++			best_freq = tmp / _prediv0;
++		}
++	}
++
++	VO_DEBUG("fout:%ld, _prediv0:%d, best_prediv:%d\n", fout, _prediv0, best_prediv);
++
++	if (best_freq) {
++		pll_param->pll_n = best_prediv - 1;
++		pll_param->pll_m = best_multi - 2;
++		pll_param->actual_freq = best_freq;
++	} else {
++		VO_ERROR("Can not find best_freq for DPHY\n");
++		return -EINVAL;
++	}
++
++	for (i = 0; i < ARRAY_SIZE(pp_table); i++) {
++		if (pll_param->actual_freq <= pp_table[i].max_freq * USEC_PER_SEC) {
++			pll_param->max_freq = pp_table[i].max_freq * USEC_PER_SEC;
++			/* cfgclkfreqrange[5:0] = round[(Fcfg_clk(MHz)-17)*4] */
++			pll_param->cfg_freq_range = (fin / USEC_PER_SEC - 17) * 4;
++			pll_param->hs_freq_range = dphy_get_hs_range(pll_param->actual_freq * 2);
++			pll_param->vco_cntrl = pp_table[i].vco_cntrl;
++			pll_param->cpbias_cntrl = pp_table[i].cpbias_cntrl;
++			pll_param->gmp_cntrl = pp_table[i].gmp_cntrl;
++			pll_param->int_cntrl = pp_table[i].int_cntrl;
++			pll_param->prop_cntrl = pp_table[i].prop_cntrl;
++			break;
++		}
++	}
++
++	VO_DEBUG("max_freq:%d, actual_freq:%d, pll_n:%d, pll_m:%d, i:%d\n",
++		 pll_param->max_freq, pll_param->actual_freq,
++		 pll_param->pll_n, pll_param->pll_m, i);
++
++	return 0;
++}
++
++static int dphy_get_hs_transition_timing(unsigned int lane_mbps, struct dw_mipi_dsi_dphy_timing *timing)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(hstt_table); i++)
++		if (lane_mbps < hstt_table[i].max_freq)
++			break;
++
++	if (i == ARRAY_SIZE(hstt_table))
++		i--;
++
++	*timing = hstt_table[i].timing;
++
++	VO_DEBUG("lane_mbps: %d, c_lp2hs: %d, c_hs2lp: %d, d_lp2hs: %d, d_hs2lp: %d\n",
++		 lane_mbps, timing->clk_lp2hs, timing->clk_hs2lp,
++		 timing->data_lp2hs, timing->data_lp2hs);
++
++	return 0;
++}
++
++static int dphy_get_lane_mbps(void *priv_data, struct display_timing *timings,
++				u32 lanes, u32 format, unsigned int *lane_mbps)
++{
++	int ret, bpp;
++	u64 tmp;
++	struct mipi_dsi_device *dsi_device = priv_data;
++	struct ax_mipi_dsi *dsi = container_of(dsi_device, struct ax_mipi_dsi, dsi_device);
++
++	VO_DEBUG("lanes:%d, mode_flags:0x%lx, format:%d\n", lanes, dsi_device->mode_flags, format);
++
++	bpp = mipi_dsi_pixel_format_to_bpp(format);
++	if (bpp < 0) {
++		VO_ERROR("format(%d) invalid\n", format);
++		return -EINVAL;
++	}
++
++	tmp = (u64)timings->pixelclock.typ;
++	/* Add 25% to pll out to be higher than pixel bandwidth (burst mode only) */
++	if (dsi_device->mode_flags & MIPI_DSI_MODE_VIDEO_BURST) {
++		VO_DEBUG("burst_factor:%d\n", dsi->burst_factor);
++		tmp = tmp * (100 + (dsi->burst_factor ? dsi->burst_factor : 25)) / 100;
++	}
++
++	tmp = tmp * 8 * (timings->hactive.typ * bpp / 8 + 2 * LONG_PKT_OVERHEAD + 1);
++	tmp = DIV_ROUND_UP(tmp, (timings->hactive.typ * lanes));
++
++	ret = dphy_get_pll_params(dsi, tmp);
++	if (ret)
++		return ret;
++
++	*lane_mbps = DIV_ROUND_UP(dsi->pll_param.actual_freq * 2, USEC_PER_SEC);
++
++	return dphy_get_hs_transition_timing(*lane_mbps, &dsi->dw_dsi.dphy_timing);
++}
++
++static struct ax_mipi_dsi mipi_dsi_arrays[] = {
++	[0] = {
++		.max_data_lanes = 4,
++		.pll_ref_clk = 24000000,
++
++		.dw_dsi = {.base = (void *)AX_DW_MIPI_DSI_BASE_ADDR},
++		.phy_ops = {
++			.init = dphy_init,
++			.get_lane_mbps = dphy_get_lane_mbps,
++		},
++
++		.mm_sys_base = (void *)MM_SYS_GLB_BASE_ADDR,
++		.dphy_base = (void *)DPHY_SYS_BASE_ADDR,
++	},
++};
++
++static inline struct ax_mipi_dsi *mipi_dsi_dev_get(u32 devid)
++{
++	struct ax_mipi_dsi *mipi_dsi;
++
++	if (devid >= sizeof(mipi_dsi_arrays) / sizeof(mipi_dsi_arrays[0])) {
++		VO_ERROR("invalid devid(%d)\n", devid);
++		return NULL;
++	}
++
++	mipi_dsi = &mipi_dsi_arrays[devid];
++
++	return mipi_dsi;
++}
++
++int ax_dw_mipi_dsi_enable(u32 devid, const struct display_timing *timing)
++{
++	struct ax_mipi_dsi *mipi_dsi = mipi_dsi_dev_get(devid);
++
++	if (!mipi_dsi) {
++		VO_ERROR("no suitable dsi dev for vo%d\n", devid);
++		return -ENODEV;
++	}
++
++	return dw_mipi_dsi_enable(&mipi_dsi->dw_dsi);
++}
++
++int ax_dw_mipi_dsi_init(u32 devid, struct display_timing *timing, struct display_timing *adjusted_timing, void *data)
++{
++	int ret;
++	struct ax_mipi_dsi *mipi_dsi = mipi_dsi_dev_get(devid);
++	struct simple_panel_cfg *panel_cfg = data;
++	struct dsi_panel_cfg *dp_cfg = &panel_cfg->dp_cfg;
++	struct mipi_dsi_device *dsi_device;
++
++	if (!mipi_dsi) {
++		VO_ERROR("no suitable dsi dev for vo%d\n", devid);
++		ret = -ENODEV;
++		goto exit;
++	}
++
++	if (panel_cfg->type != PANEL_TYPE_MIPI) {
++		VO_ERROR("panel cfg mismatch for vo%d\n", devid);
++		ret = -EINVAL;
++		goto exit;
++	}
++
++	dsi_device = &mipi_dsi->dsi_device;
++	dsi_device->lanes = dp_cfg->lanes;
++	dsi_device->format = dp_cfg->format;
++	dsi_device->mode_flags = dp_cfg->mode_flags;
++	mipi_dsi->burst_factor = dp_cfg->burst_factor;
++	dp_cfg->dsi_dev = dsi_device;
++
++	writel(0x1, mipi_dsi->mm_sys_base + 0xAC);
++
++	ax650_dsi_reset(devid);
++
++	ret = dw_mipi_dsi_init(&mipi_dsi->dw_dsi, dsi_device, timing, adjusted_timing,
++			       mipi_dsi->max_data_lanes, &mipi_dsi->phy_ops);
++	if (ret) {
++		VO_ERROR("vo%d dw mipi dsi init failed, ret:%d\n", devid, ret);
++		goto exit;
++	}
++
++exit:
++	VO_INFO("mipi dsi%d init %s\n", devid, ret ? "failed" : "success");
++
++	return ret;
++}
++
+diff --git a/drivers/video/axera/ax_dw_mipi_dsi.h b/drivers/video/axera/ax_dw_mipi_dsi.h
+new file mode 100644
+index 00000000..3ed4aff1
+--- /dev/null
++++ b/drivers/video/axera/ax_dw_mipi_dsi.h
+@@ -0,0 +1,18 @@
++/**************************************************************************************************
++ *
++ * Copyright (c) 2019-2024 Axera Semiconductor Co., Ltd. All Rights Reserved.
++ *
++ * This source file is the property of Axera Semiconductor Co., Ltd. and
++ * may not be copied or distributed in any isomorphic form without the prior
++ * written consent of Axera Semiconductor Co., Ltd.
++ *
++ **************************************************************************************************/
++
++#ifndef __AX_DW_MIPI_DSI_H__
++#define __AX_DW_MIPI_DSI_H__
++
++int ax_dw_mipi_dsi_enable(u32 devid, const struct display_timing *timing);
++int ax_dw_mipi_dsi_init(u32 devid, struct display_timing *timing, struct display_timing *adjusted_timing, void *data);
++
++#endif
++
 diff --git a/drivers/video/axera/ax_simple_logo.c b/drivers/video/axera/ax_simple_logo.c
 new file mode 100644
-index 00000000..129ff97f
+index 00000000..66369938
 --- /dev/null
 +++ b/drivers/video/axera/ax_simple_logo.c
-@@ -0,0 +1,485 @@
+@@ -0,0 +1,499 @@
 +/**************************************************************************************************
 + *
 + * Copyright (c) 2019-2024 Axera Semiconductor Co., Ltd. All Rights Reserved.
@@ -247781,12 +248323,13 @@ index 00000000..129ff97f
 +	}
 +
 +	printf("func:%s, jpeg param: width:%d, height:%d, channels:%d.\n", __func__, width, height, channels);
-+	if (width > AX_MAX_VO_JPG_WIDTH || height > AX_MAX_VO_JPG_HEIGHT) {
-+		printf("jpeg resolution out of range. [%d , %d]\n", AX_MAX_VO_JPG_WIDTH, AX_MAX_VO_JPG_HEIGHT);
++	if (width * height * channels > AX_MAX_VO_JPG_WIDTH * AX_MAX_VO_JPG_HEIGHT * AX_VO_JPG_CHANNEL) {
++		printf("jpeg resolution out of range[%d, %d]\n", AX_MAX_VO_JPG_WIDTH, AX_MAX_VO_JPG_HEIGHT);
 +		ret = -1;
 +		goto ERR_RET_FREE;
 +	}
 +
++#if 0
 +	if (((width == 1920) && (height == 1080)) ||
 +	    ((width == 1280) && (height == 1024)) ||
 +	    ((width == 1024) && (height == 768))) {
@@ -247799,6 +248342,10 @@ index 00000000..129ff97f
 +		newWidth = AX_MIN_RESIZE_WIDTH;
 +		newHeight = AX_MIN_RESIZE_HEIGHT;
 +	}
++#else
++	newWidth = AX_VO_JPEG_ALIGN(width, 16);
++	newHeight = AX_VO_JPEG_ALIGN(height, 2);
++#endif
 +
 +	padding = (4 - (newWidth * channels) % 4) % 4;
 +	rowSize = newWidth * channels + padding;
@@ -247946,6 +248493,10 @@ index 00000000..129ff97f
 +		return AX_VO_FORMAT_ARGB8888;
 +}
 +
++extern struct simple_panel_cfg g_panel_cfg;
++extern u32 g_vdev_id;
++extern u32 g_out_type;
++extern u32 g_fixed_sync;
 +extern int get_part_info(struct blk_desc *dev_desc, const char *name, disk_partition_t * info);
 +int ax_bootlogo_show(void)
 +{
@@ -247965,7 +248516,9 @@ index 00000000..129ff97f
 +	void *gz_alloc_addr = NULL;
 +	u32 display_x = 0;
 +	u32 display_y = 0;
-+	u32 sync = 0;
++	u32 vdev = g_vdev_id;
++	u32 type = g_out_type;
++	u32 sync = g_fixed_sync;
 +
 +	memset((void *)boot_mode, 0, sizeof(boot_mode_info_t));
 +	boot_mode->magic = BOOT_MODE_ENV_MAGIC;
@@ -248075,19 +248628,23 @@ index 00000000..129ff97f
 +		dp_info.display_y = display_y;
 +		dp_info.display_addr = LOGO_SHOW_BUFFER;
 +
-+		if ((dp_info.img_width == 1920) && (dp_info.img_height == 1080)) {
-+			sync = AX_VO_OUTPUT_1080P60;
-+		} else if ((dp_info.img_width == 1280) && (dp_info.img_height == 1024)) {
-+			sync = AX_VO_OUTPUT_1280x1024_60;
-+		} else if ((dp_info.img_width <= 1024) && (dp_info.img_height <= 768)) {
-+			sync = AX_VO_OUTPUT_1024x768_60;
-+		} else {
-+			printf("%s unsupported resolution(%dx%d)\n", __func__, dp_info.img_width, dp_info.img_height);
-+			ret = -1;
-+			goto ERR_RET;
++		if (sync >= AX_VO_OUTPUT_BUTT) {
++			if ((dp_info.img_width == 1920) && (dp_info.img_height == 1080)) {
++				sync = AX_VO_OUTPUT_1080P60;
++			} else if ((dp_info.img_width == 1280) && (dp_info.img_height == 1024)) {
++				sync = AX_VO_OUTPUT_1280x1024_60;
++			} else if ((dp_info.img_width <= 1024) && (dp_info.img_height <= 768)) {
++				sync = AX_VO_OUTPUT_1024x768_60;
++			} else {
++				printf("%s unsupported resolution(%dx%d)\n", __func__, dp_info.img_width, dp_info.img_height);
++				ret = -1;
++				goto ERR_RET;
++			}
 +		}
 +
-+		ret = ax_start_vo(LOGO_SHOW_DEVID, AX_DISP_OUT_MODE_HDMI, sync, &dp_info);
++		dp_info.priv = &g_panel_cfg;
++
++		ret = ax_start_vo(vdev, type, sync, &dp_info);
 +	}
 +
 +ERR_RET:
@@ -248108,13 +248665,12 @@ index 00000000..129ff97f
 +
 +void ax_bootlogo_handle(void)
 +{
-+	if (AX650N_CHIP == get_chip_type_id())
-+		ax_bootlogo_show();
++	ax_bootlogo_show();
 +}
 \ No newline at end of file
 diff --git a/drivers/video/axera/ax_simple_logo.h b/drivers/video/axera/ax_simple_logo.h
 new file mode 100644
-index 00000000..2fb80e97
+index 00000000..fe40b79b
 --- /dev/null
 +++ b/drivers/video/axera/ax_simple_logo.h
 @@ -0,0 +1,37 @@
@@ -248131,8 +248687,8 @@ index 00000000..2fb80e97
 +#ifndef __AXERA_SIMPLE_LOGO_H__
 +#define __AXERA_SIMPLE_LOGO_H__
 +
-+#define AX_MAX_VO_JPG_WIDTH 1920
-+#define AX_MAX_VO_JPG_HEIGHT 1080
++#define AX_MAX_VO_JPG_WIDTH 2048
++#define AX_MAX_VO_JPG_HEIGHT 2048
 +#define AX_VO_JPG_CHANNEL 3
 +#define AX_MIN_RESIZE_WIDTH 1024
 +#define AX_MIN_RESIZE_HEIGHT 768
@@ -248156,6 +248712,186 @@ index 00000000..2fb80e97
 +} AX_VO_LOGO_FMT_E;
 +#endif
 \ No newline at end of file
+diff --git a/drivers/video/axera/ax_simple_logo_cfg.c b/drivers/video/axera/ax_simple_logo_cfg.c
+new file mode 100644
+index 00000000..b9ccba6d
+--- /dev/null
++++ b/drivers/video/axera/ax_simple_logo_cfg.c
+@@ -0,0 +1,174 @@
++/**************************************************************************************************
++ *
++ * Copyright (c) 2019-2024 Axera Semiconductor Co., Ltd. All Rights Reserved.
++ *
++ * This source file is the property of Axera Semiconductor Co., Ltd. and
++ * may not be copied or distributed in any isomorphic form without the prior
++ * written consent of Axera Semiconductor Co., Ltd.
++ *
++ **************************************************************************************************/
++
++#include <common.h>
++#include <hexdump.h>
++#include <mipi_dsi.h>
++#include <asm/gpio.h>
++
++#include "ax_vo.h"
++
++#define msleep(a)	udelay(a * 1000)
++
++static u8 init_seq[] = {
++	0x39, 0x00, 0x04, 0xB9, 0xFF, 0x83, 0x99,
++	0x39, 0x00, 0x10, 0xB1, 0x02, 0x04, 0x6B, 0x8B, 0x01, 0x32, 0x33, 0x11, 0x11, 0x53, 0x01, 0x56, 0x73, 0x02, 0x02,
++	0x39, 0x00, 0x0c, 0xB2, 0x00, 0x80, 0x80, 0xAE, 0x05, 0x07, 0x5A, 0x11, 0x00, 0x10, 0x10,
++	0x39, 0x00, 0x2d, 0xB4, 0x00, 0xFF, 0x00, 0xAC, 0x00, 0x9C, 0x00, 0x00, 0x08, 0x00, 0x00, 0x02, 0x00, 0x26, 0x02, 0x07, 0x09, 0x21, 0x03, 0x00, 0x00, 0x04, 0xA4, 0x88, 0x00, 0xAC, 0x00, 0x9C, 0x00, 0x00, 0x08, 0x00, 0x00, 0x02, 0x00, 0x24, 0x02, 0x07, 0x09, 0x00, 0x00, 0x04, 0xA4, 0x12,
++	0x39, 0x05, 0x22, 0xD3, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x32, 0x10, 0x05, 0x00, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x07, 0x07, 0x03, 0x00, 0x00, 0x00, 0x05, 0x40,
++	0x39, 0x05, 0x21, 0xD5, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03, 0x00, 0x00, 0x00, 0x00, 0x19, 0x00, 0x18, 0x00, 0x20, 0x21, 0x00, 0x18, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x31, 0x31, 0x30, 0x30, 0x2F, 0x2F,
++	0x39, 0x05, 0x21, 0xD6, 0x40, 0x40, 0x03, 0x02, 0x01, 0x00, 0x40, 0x40, 0x40, 0x40, 0x18, 0x40, 0x19, 0x40, 0x21, 0x20, 0x40, 0x18, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x31, 0x31, 0x30, 0x30, 0x2F, 0x2F,
++	0x39, 0x00, 0x11, 0xD8, 0x28, 0x02, 0x00, 0x2A, 0x8, 0x02, 0xC0, 0x2A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x15, 0x00, 0x02, 0xBD, 0x01,
++	0x39, 0x00, 0x11, 0xD8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x28, 0x2A, 0x00, 0x2A, 0x28, 0x02, 0xC0, 0x2A,
++	0x15, 0x00, 0x02, 0xBD, 0x02,
++	0x39, 0x00, 0x09, 0xD8, 0x28, 0x2A, 0x00, 0x2A, 0x28, 0x02, 0xC0, 0x2A,
++	0x15, 0x00, 0x02, 0xBD, 0x00,
++	0x39, 0x00, 0x03, 0xB6, 0x8D, 0x8D,
++	0x39, 0x00, 0x37, 0xE0, 0x01, 0x49, 0x4F, 0x45, 0x87, 0x8A, 0x8F, 0x84, 0x88, 0x8D, 0x91, 0x94, 0x97, 0x9B, 0xA1, 0xA2, 0xA4, 0xAA, 0xAB, 0xB0, 0xA2, 0xAF, 0xAF, 0x59, 0x54, 0x5E, 0x6D, 0x01, 0x49, 0x4F, 0x45, 0x87, 0x8A, 0x8F, 0x84, 0x88, 0x8D, 0x91, 0x94, 0x97, 0x9B, 0xA1, 0xA2, 0xA4, 0xAA, 0xAB, 0xB0, 0xA2, 0xAF, 0xAF, 0x59, 0x54, 0x5E, 0x6D,
++	0x15, 0x00, 0x02, 0xD2, 0x33,
++	0x39, 0x00, 0x03, 0xB6, 0x7D, 0x7D,
++	0x39, 0x00, 0x08, 0xBF, 0x40, 0x41, 0x50, 0x09, 0x1A, 0x80, 0xCD,
++	0x15, 0x00, 0x02, 0xCC, 0x08,
++	0x15, 0x05, 0x02, 0x36, 0x00,
++	0x05, 0x00, 0x01, 0x35,
++	0x05, 0x00, 0x01, 0x29,
++	0x05, 0x05, 0x01, 0x11
++};
++
++static int panel_send_dsi_cmds(struct mipi_dsi_device *dsi, u8 *data, int len)
++{
++	int i, delay, cmd_len, ret;
++
++	for (i = 0; i < len; i += (cmd_len + 3)) {
++		delay = data[i + 1];
++		cmd_len = data[i + 2];
++		if (cmd_len + i + 3 > len) {
++			print_hex_dump("cmd overflow, cmd: ", DUMP_PREFIX_NONE,
++			               16, 1, &data[i], len - i, false);
++			return -EINVAL;
++		}
++
++		pr_info("%s delay = %d, cmd_len = %d\n", __func__, delay, cmd_len);
++
++		switch (data[i]) {
++		case MIPI_DSI_DCS_SHORT_WRITE:
++		case MIPI_DSI_DCS_SHORT_WRITE_PARAM:
++		case MIPI_DSI_DCS_LONG_WRITE:
++			ret = mipi_dsi_dcs_write_buffer(dsi, &data[i + 3], cmd_len);
++			if (ret < 0) {
++				print_hex_dump("dcs send failed, cmd: ", DUMP_PREFIX_NONE,
++				               16, 1, &data[i], cmd_len + 3, false);
++				return ret;
++			}
++			break;
++
++		case MIPI_DSI_GENERIC_SHORT_WRITE_0_PARAM:
++		case MIPI_DSI_GENERIC_SHORT_WRITE_1_PARAM:
++		case MIPI_DSI_GENERIC_SHORT_WRITE_2_PARAM:
++		case MIPI_DSI_GENERIC_LONG_WRITE:
++			ret = mipi_dsi_generic_write(dsi, &data[i + 3], cmd_len);
++			if (ret < 0) {
++				print_hex_dump("generic send failed, cmd: ", DUMP_PREFIX_NONE,
++				               16, 1, &data[i], cmd_len + 3, false);
++				return ret;
++			}
++			break;
++
++		default:
++			pr_err("%s unsupported data type, type = 0x%x\n", __func__, data[i]);
++			return -EINVAL;
++		}
++
++		print_hex_dump("send success, cmd: ", DUMP_PREFIX_NONE,
++		               16, 1, &data[i], cmd_len + 3, false);
++
++		if (delay)
++			msleep(delay);
++	}
++
++	return 0;
++}
++
++static int simple_panel_init(struct simple_panel_cfg *panel_cfg)
++{
++	int ret = 0, gpio;
++	struct dsi_panel_cfg *dp_cfg = &panel_cfg->dp_cfg;
++
++	if (PANEL_GPIO_VALID(panel_cfg->enable_gpio)) {
++		gpio = PANEL_GPIO_GET(panel_cfg->enable_gpio);
++
++		ret = gpio_request(gpio, "panel-enable");
++		if(ret < 0) {
++			VO_ERROR("request enable-gpio(%d) failed, ret:%d\n", gpio, ret);
++			goto exit;
++		}
++
++		ret = gpio_direction_output(gpio, 1);
++		if(ret < 0) {
++			VO_ERROR("set enable-gpio(%d) direction failed, ret:%d\n", gpio, ret);
++			goto exit;
++		}
++	}
++
++	if (PANEL_GPIO_VALID(panel_cfg->reset_gpio)) {
++		gpio = PANEL_GPIO_GET(panel_cfg->reset_gpio);
++
++		ret = gpio_request(gpio, "panel-reset");
++		if(ret < 0) {
++			VO_ERROR("request reset-gpio(%d) failed, ret:%d\n", gpio, ret);
++			goto exit;
++		}
++
++		ret = gpio_direction_output(gpio, 1);
++		if(ret < 0) {
++			VO_ERROR("set reset-gpio(%d) direction failed, ret:%d\n", gpio, ret);
++			goto exit;
++		}
++
++		gpio_set_value(gpio, 0);
++		mdelay(10);
++		gpio_set_value(gpio, 1);
++		mdelay(panel_cfg->reset_delay_ms);
++	}
++
++	if ((panel_cfg->type == PANEL_TYPE_MIPI) && dp_cfg->dsi_dev)
++		ret = panel_send_dsi_cmds(dp_cfg->dsi_dev, dp_cfg->init_seq, dp_cfg->num_init_seqs);
++
++exit:
++	VO_INFO("panel init %s\n", ret ? "failed" : "success");
++
++	return ret;
++}
++
++struct simple_panel_cfg g_panel_cfg = {
++	.type = PANEL_TYPE_MIPI,
++	.dp_cfg = {
++		.lanes = 4,
++		.format = MIPI_DSI_FMT_RGB888,
++		//.mode_flags = MIPI_DSI_MODE_VIDEO_BURST | MIPI_DSI_MODE_VIDEO | MIPI_DSI_MODE_LPM,
++		.mode_flags = MIPI_DSI_MODE_VIDEO | MIPI_DSI_MODE_LPM,
++		.burst_factor = 8,
++		.num_init_seqs = sizeof(init_seq) / sizeof(init_seq[0]),
++		.init_seq = init_seq,
++	},
++	.reset_gpio = PANEL_GPIO_SET(23),
++	.reset_delay_ms = 60,
++	.init = simple_panel_init,
++};
++
++u32 g_vdev_id = 0;
++#if 0
++u32 g_out_type = AX_DISP_OUT_MODE_DSI_VIDEO;
++u32 g_fixed_sync = AX_VO_OUTPUT_1080x1920_60;
++#else
++u32 g_out_type = AX_DISP_OUT_MODE_HDMI;
++u32 g_fixed_sync = AX_VO_OUTPUT_1080P60;
++#endif
 diff --git a/drivers/video/axera/ax_simple_pattern.c b/drivers/video/axera/ax_simple_pattern.c
 new file mode 100644
 index 00000000..f94a34c5
@@ -248276,10 +249012,10 @@ index 00000000..f94a34c5
 +
 diff --git a/drivers/video/axera/ax_vo.c b/drivers/video/axera/ax_vo.c
 new file mode 100644
-index 00000000..00ba88b5
+index 00000000..2e87ec4b
 --- /dev/null
 +++ b/drivers/video/axera/ax_vo.c
-@@ -0,0 +1,611 @@
+@@ -0,0 +1,637 @@
 +/**************************************************************************************************
 + *
 + * Copyright (c) 2019-2024 Axera Semiconductor Co., Ltd. All Rights Reserved.
@@ -248389,11 +249125,12 @@ index 00000000..00ba88b5
 +
 +	if (dp_mode->flags & DISPLAY_MODE_FLAG_PHSYNC)
 +		timing->flags |= DISPLAY_FLAGS_HSYNC_HIGH;
-+	else if (dp_mode->flags & DISPLAY_MODE_FLAG_NHSYNC)
++	else
 +		timing->flags |= DISPLAY_FLAGS_HSYNC_LOW;
++
 +	if (dp_mode->flags & DISPLAY_MODE_FLAG_PVSYNC)
 +		timing->flags |= DISPLAY_FLAGS_VSYNC_HIGH;
-+	else if (dp_mode->flags & DISPLAY_MODE_FLAG_NVSYNC)
++	else
 +		timing->flags |= DISPLAY_FLAGS_VSYNC_LOW;
 +
 +	/* The default DE polarity is the same as HSYNC */
@@ -248421,6 +249158,11 @@ index 00000000..00ba88b5
 +				.bridge_init = ax_dw_hdmi_init,
 +				.bridge_enable = ax_dw_hdmi_enable,
 +			},
++			[BRIDGE_INDEX_DSI] = {
++				.id = 0,
++				.bridge_init = ax_dw_mipi_dsi_init,
++				.bridge_enable = ax_dw_mipi_dsi_enable,
++			},
 +		},
 +		.pixel_clk_set = ax650_pixel_clk_set,
 +	},
@@ -248445,12 +249187,12 @@ index 00000000..00ba88b5
 +	},
 +};
 +
-+int ax_bridge_init(struct ax_bridge_device *bridge_dev)
++int ax_bridge_init(struct ax_bridge_device *bridge_dev, struct display_timing *timing, struct display_timing *adjusted_timing)
 +{
 +	int ret = 0;
 +
 +	if (bridge_dev && bridge_dev->bridge_init)
-+		ret = bridge_dev->bridge_init(bridge_dev->id);
++		ret = bridge_dev->bridge_init(bridge_dev->id, timing, adjusted_timing, bridge_dev->data);
 +
 +	return ret;
 +}
@@ -248553,7 +249295,7 @@ index 00000000..00ba88b5
 +	task.dst_stride_y = (ddev->mode.hdisplay + 0xf) & (~0xf);
 +	task.dst_stride_c = task.dst_stride_y;
 +	task.dst_phy_addr_y = dp_info->display_addr;
-+	task.dst_phy_addr_c = task.dst_phy_addr_y + task.dst_w * task.dst_h;
++	task.dst_phy_addr_c = task.dst_phy_addr_y + task.dst_stride_y * task.dst_h;
 +
 +	task.data = &ddev->hdev;
 +	task.cmd_buf_phys = (task.dst_phy_addr_y + task.dst_stride_c * task.dst_h * 3 / 2 + 0xF) & (~0xFUL);
@@ -248608,9 +249350,9 @@ index 00000000..00ba88b5
 +	mode->vsync_start = mode->vdisplay + timing->vfront_porch.typ;
 +	mode->vsync_end = mode->vsync_start + timing->vsync_len.typ;
 +	mode->vtotal = mode->vsync_end + timing->vback_porch.typ;
-+	mode->hp_pol = timing->flags & DISPLAY_FLAGS_HSYNC_LOW ? 0 : 1;
-+	mode->vp_pol = timing->flags & DISPLAY_FLAGS_VSYNC_LOW ? 0 : 1;
-+	mode->de_pol = timing->flags & DISPLAY_FLAGS_DE_LOW ? 0 : 1;
++	mode->hp_pol = timing->flags & DISPLAY_FLAGS_HSYNC_HIGH ? 0 : 1;
++	mode->vp_pol = timing->flags & DISPLAY_FLAGS_VSYNC_HIGH ? 0 : 1;
++	mode->de_pol = timing->flags & DISPLAY_FLAGS_DE_HIGH ? 0 : 1;
 +
 +	mode->vrefresh = (timing->pixelclock.typ + ((mode->vtotal * mode->htotal) >> 1)) /
 +	                 (mode->vtotal * mode->htotal);
@@ -248646,9 +249388,25 @@ index 00000000..00ba88b5
 +	u32 type = pipe->type, sync = pipe->sync;
 +	struct ax_dpu_device *ddev = &pipe->ddev;
 +	struct ax_disp_mode *mode = &ddev->mode;
-+	struct display_timing timing = {0};
++	struct display_timing timing = {0}, adjusted_timing;
 +
 +	VO_DEBUG("pipe%d\n", pipe->id);
++
++	if (sync < AX_VO_OUTPUT_BUTT) {
++		ret = display_mode2timing(sync, &timing);
++		if (ret < 0) {
++			VO_ERROR("dpu%d sync(%d) invalid\n", ddev->id, sync);
++			return ret;
++		}
++	}
++
++	adjusted_timing = timing;
++
++	VO_DEBUG("timing: %d %d %d %d %d %d %d %d %d 0x%x\n",
++		  timing.pixelclock.typ, timing.hactive.typ, timing.hfront_porch.typ,
++		  timing.hback_porch.typ, timing.hsync_len.typ, timing.vactive.typ,
++		  timing.vfront_porch.typ, timing.vback_porch.typ, timing.vsync_len.typ,
++		  timing.flags);
 +
 +	ret = ax_dpu_init(ddev);
 +	if (ret) {
@@ -248659,30 +249417,33 @@ index 00000000..00ba88b5
 +	bridge_index = type2bridge_index(type);
 +
 +	if (bridge_index < BRIDGE_INDEX_BUTT) {
-+		ret = ax_bridge_init(&pipe->bridge[bridge_index]);
++		struct ax_bridge_device *bridge = &pipe->bridge[bridge_index];
++
++		bridge->data = pipe->panel_cfg;
++
++		ret = ax_bridge_init(bridge, &timing, &adjusted_timing);
 +		if (ret) {
 +			VO_ERROR("failed to init vo%d bridge%d\n", pipe->id, bridge_index);
 +			return ret;
 +		}
 +	}
 +
-+	if (sync < AX_VO_OUTPUT_BUTT) {
-+		ret = display_mode2timing(sync, &timing);
-+		if (ret < 0) {
-+			VO_ERROR("dpu%d sync(%d) invalid\n", ddev->id, sync);
++	VO_DEBUG("adjusted_timing: %d %d %d %d %d %d %d %d %d 0x%x\n",
++		  adjusted_timing.pixelclock.typ, adjusted_timing.hactive.typ, adjusted_timing.hfront_porch.typ,
++		  adjusted_timing.hback_porch.typ, adjusted_timing.hsync_len.typ, adjusted_timing.vactive.typ,
++		  adjusted_timing.vfront_porch.typ, adjusted_timing.vback_porch.typ, adjusted_timing.vsync_len.typ,
++		  adjusted_timing.flags);
++
++	if (pipe->panel_cfg && pipe->panel_cfg->init) {
++		ret = pipe->panel_cfg->init(pipe->panel_cfg);
++		if (ret) {
++			VO_ERROR("failed to panel init, ret:%d\n", ret);
 +			return ret;
 +		}
-+
 +	}
 +
-+	VO_DEBUG("timing: [%d, %d, %d, %d, %d, %d, %d, %d, %d, 0x%x]\n",
-+		  timing.pixelclock.typ, timing.hactive.typ, timing.hfront_porch.typ,
-+		  timing.hback_porch.typ, timing.hsync_len.typ, timing.vactive.typ,
-+		  timing.vfront_porch.typ, timing.vback_porch.typ, timing.vsync_len.typ,
-+		  timing.flags);
-+
 +	if (pipe->pixel_clk_set) {
-+		ret = pipe->pixel_clk_set(pipe->id, timing.pixelclock.typ);
++		ret = pipe->pixel_clk_set(pipe->id, adjusted_timing.pixelclock.typ);
 +		if (ret) {
 +			VO_ERROR("failed to set vo%d pixel clock\n", pipe->id);
 +			return ret;
@@ -248693,7 +249454,7 @@ index 00000000..00ba88b5
 +	mode->fmt_in = AX_VO_FORMAT_NV12;
 +	mode->fmt_out = AX_DISP_OUT_FMT_RGB888;
 +
-+	ret = display_timing2disp_mode(&timing, mode);
++	ret = display_timing2disp_mode(&adjusted_timing, mode);
 +	if (ret) {
 +		VO_ERROR("failed to get dpu%d mode\n", ddev->id);
 +		return ret;
@@ -248706,14 +249467,14 @@ index 00000000..00ba88b5
 +	}
 +
 +	if (bridge_index < BRIDGE_INDEX_BUTT) {
-+		ret = ax_bridge_enable(&pipe->bridge[bridge_index], &timing);
++		ret = ax_bridge_enable(&pipe->bridge[bridge_index], &adjusted_timing);
 +		if (ret) {
 +			VO_ERROR("failed to enable vo%d bridge%d\n", pipe->id, bridge_index);
 +			return ret;
 +		}
 +	}
 +
-+	ddev->timing = timing;
++	ddev->timing = adjusted_timing;
 +
 +	VO_DEBUG("pipe%d success\n", pipe->id);
 +
@@ -248884,6 +249645,7 @@ index 00000000..00ba88b5
 +
 +	pipe->type = type;
 +	pipe->sync = sync;
++	pipe->panel_cfg = dp_info->priv;
 +
 +	ret = ax_vo_pipe_init(pipe);
 +	if (ret)
@@ -248893,10 +249655,10 @@ index 00000000..00ba88b5
 +}
 diff --git a/drivers/video/axera/ax_vo.h b/drivers/video/axera/ax_vo.h
 new file mode 100644
-index 00000000..79c7973c
+index 00000000..f7dc6f77
 --- /dev/null
 +++ b/drivers/video/axera/ax_vo.h
-@@ -0,0 +1,118 @@
+@@ -0,0 +1,123 @@
 +/**************************************************************************************************
 + *
 + * Copyright (c) 2019-2024 Axera Semiconductor Co., Ltd. All Rights Reserved.
@@ -248923,6 +249685,8 @@ index 00000000..79c7973c
 +	u32 display_x;
 +	u32 display_y;
 +	u64 display_addr;
++
++	void *priv;
 +};
 +
 +struct draw_task {
@@ -248977,7 +249741,8 @@ index 00000000..79c7973c
 +struct ax_bridge_device {
 +	int id;
 +
-+	int (*bridge_init)(u32 devid);
++	int (*bridge_init)(u32 devid, struct display_timing *timing,
++			   struct display_timing *adjusted_timing, void *data);
 +	int (*bridge_enable)(u32 devid, const struct display_timing *timing);
 +	void *data;
 +};
@@ -249005,6 +249770,8 @@ index 00000000..79c7973c
 +	u32 type;
 +	u32 sync;
 +
++	struct simple_panel_cfg *panel_cfg;
++
 +	struct ax_dpu_device ddev;
 +	struct ax_bridge_device bridge[BRIDGE_INDEX_BUTT];
 +
@@ -249017,10 +249784,10 @@ index 00000000..79c7973c
 +#endif /* __AX_VO_H */
 diff --git a/drivers/video/axera/ax_vo_common.h b/drivers/video/axera/ax_vo_common.h
 new file mode 100644
-index 00000000..d638951d
+index 00000000..6dadfbcc
 --- /dev/null
 +++ b/drivers/video/axera/ax_vo_common.h
-@@ -0,0 +1,169 @@
+@@ -0,0 +1,204 @@
 +/**************************************************************************************************
 + *
 + * Copyright (c) 2019-2024 Axera Semiconductor Co., Ltd. All Rights Reserved.
@@ -249038,6 +249805,7 @@ index 00000000..d638951d
 +
 +#include "ax650_mm_ck.h"
 +#include "ax_dw_hdmi.h"
++#include "ax_dw_mipi_dsi.h"
 +
 +#define VO_LOG_ON
 +#ifdef VO_LOG_ON
@@ -249177,6 +249945,40 @@ index 00000000..d638951d
 +	int hp_pol;
 +	int vp_pol;
 +	int de_pol;
++};
++
++struct dsi_panel_cfg {
++	u32 lanes;
++	u32 format;
++	unsigned long mode_flags;
++
++	u32 burst_factor;
++
++	u32 num_init_seqs;
++	u8 *init_seq;
++
++	void *dsi_dev;
++};
++
++enum {
++	PANEL_TYPE_NORMAL,
++	PANEL_TYPE_MIPI,
++};
++
++#define PANEL_GPIO_SET(GPIO_NUM)	((1 << 16) | ((GPIO_NUM) & 0xFFFF))
++#define PANEL_GPIO_GET(VAL)  		((VAL) & 0xFFFF)
++#define PANEL_GPIO_VALID(VAL)		!!((1 << 16) & (VAL))
++
++struct simple_panel_cfg {
++	u32 type;
++	struct dsi_panel_cfg dp_cfg;
++
++	u32 enable_gpio;
++
++	u32 reset_gpio;
++	u32 reset_delay_ms;
++
++	int (*init)(struct simple_panel_cfg *panel_cfg);
 +};
 +
 +static inline void vo_writel(void __iomem *regs, u32 offset, u32 val)
@@ -251616,6 +252418,911 @@ index 00000000..28f7bbc8
 +
 +#endif
 +
+diff --git a/drivers/video/axera/dw_mipi_dsi.c b/drivers/video/axera/dw_mipi_dsi.c
+new file mode 100644
+index 00000000..b65910ba
+--- /dev/null
++++ b/drivers/video/axera/dw_mipi_dsi.c
+@@ -0,0 +1,853 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Copyright (C) 2016, Fuzhou Rockchip Electronics Co., Ltd
++ * Copyright (C) 2019, STMicroelectronics - All Rights Reserved
++ * Author(s): Philippe Cornu <philippe.cornu@st.com> for STMicroelectronics.
++ *            Yannick Fertre <yannick.fertre@st.com> for STMicroelectronics.
++ *
++ * This generic Synopsys DesignWare MIPI DSI host driver is inspired from
++ * the Linux Kernel driver drivers/gpu/drm/bridge/synopsys/dw-mipi-dsi.c.
++ */
++
++#include <common.h>
++#include <clk.h>
++#include <dsi_host.h>
++#include <dm.h>
++#include <errno.h>
++#include <panel.h>
++#include <video.h>
++#include <asm/io.h>
++#include <asm/arch/gpio.h>
++#include <dm/device-internal.h>
++#include <dm/device_compat.h>
++#include <linux/iopoll.h>
++#include <video_bridge.h>
++
++#include "dw_mipi_dsi.h"
++
++#define HWVER_131			0x31333100	/* IP version 1.31 */
++
++#define DSI_VERSION			0x00
++#define VERSION				GENMASK(31, 8)
++
++#define DSI_PWR_UP			0x04
++#define RESET				0
++#define POWERUP				BIT(0)
++
++#define DSI_CLKMGR_CFG			0x08
++#define TO_CLK_DIVISION(div)		(((div) & 0xff) << 8)
++#define TX_ESC_CLK_DIVISION(div)	((div) & 0xff)
++
++#define DSI_DPI_VCID			0x0c
++#define DPI_VCID(vcid)			((vcid) & 0x3)
++
++#define DSI_DPI_COLOR_CODING		0x10
++#define LOOSELY18_EN			BIT(8)
++#define DPI_COLOR_CODING_16BIT_1	0x0
++#define DPI_COLOR_CODING_16BIT_2	0x1
++#define DPI_COLOR_CODING_16BIT_3	0x2
++#define DPI_COLOR_CODING_18BIT_1	0x3
++#define DPI_COLOR_CODING_18BIT_2	0x4
++#define DPI_COLOR_CODING_24BIT		0x5
++
++#define DSI_DPI_CFG_POL			0x14
++#define COLORM_ACTIVE_LOW		BIT(4)
++#define SHUTD_ACTIVE_LOW		BIT(3)
++#define HSYNC_ACTIVE_LOW		BIT(2)
++#define VSYNC_ACTIVE_LOW		BIT(1)
++#define DATAEN_ACTIVE_LOW		BIT(0)
++
++#define DSI_DPI_LP_CMD_TIM		0x18
++#define OUTVACT_LPCMD_TIME(p)		(((p) & 0xff) << 16)
++#define INVACT_LPCMD_TIME(p)		((p) & 0xff)
++
++#define DSI_DBI_VCID			0x1c
++#define DSI_DBI_CFG			0x20
++#define DSI_DBI_PARTITIONING_EN		0x24
++#define DSI_DBI_CMDSIZE			0x28
++
++#define DSI_PCKHDL_CFG			0x2c
++#define CRC_RX_EN			BIT(4)
++#define ECC_RX_EN			BIT(3)
++#define BTA_EN				BIT(2)
++#define EOTP_RX_EN			BIT(1)
++#define EOTP_TX_EN			BIT(0)
++
++#define DSI_GEN_VCID			0x30
++
++#define DSI_MODE_CFG			0x34
++#define ENABLE_VIDEO_MODE		0
++#define ENABLE_CMD_MODE			BIT(0)
++
++#define DSI_VID_MODE_CFG		0x38
++#define ENABLE_LOW_POWER		(0x3f << 8)
++#define ENABLE_LOW_POWER_MASK		(0x3f << 8)
++#define VID_MODE_TYPE_NON_BURST_SYNC_PULSES	0x0
++#define VID_MODE_TYPE_NON_BURST_SYNC_EVENTS	0x1
++#define VID_MODE_TYPE_BURST			0x2
++#define VID_MODE_TYPE_MASK			0x3
++#define ENABLE_LOW_POWER_CMD		BIT(15)
++#define VID_MODE_VPG_ENABLE		BIT(16)
++#define VID_MODE_VPG_MODE		BIT(20)
++#define VID_MODE_VPG_HORIZONTAL		BIT(24)
++
++#define DSI_VID_PKT_SIZE		0x3c
++#define VID_PKT_SIZE(p)			((p) & 0x3fff)
++
++#define DSI_VID_NUM_CHUNKS		0x40
++#define VID_NUM_CHUNKS(c)		((c) & 0x1fff)
++
++#define DSI_VID_NULL_SIZE		0x44
++#define VID_NULL_SIZE(b)		((b) & 0x1fff)
++
++#define DSI_VID_HSA_TIME		0x48
++#define DSI_VID_HBP_TIME		0x4c
++#define DSI_VID_HLINE_TIME		0x50
++#define DSI_VID_VSA_LINES		0x54
++#define DSI_VID_VBP_LINES		0x58
++#define DSI_VID_VFP_LINES		0x5c
++#define DSI_VID_VACTIVE_LINES		0x60
++#define DSI_EDPI_CMD_SIZE		0x64
++
++#define DSI_CMD_MODE_CFG		0x68
++#define MAX_RD_PKT_SIZE_LP		BIT(24)
++#define DCS_LW_TX_LP			BIT(19)
++#define DCS_SR_0P_TX_LP			BIT(18)
++#define DCS_SW_1P_TX_LP			BIT(17)
++#define DCS_SW_0P_TX_LP			BIT(16)
++#define GEN_LW_TX_LP			BIT(14)
++#define GEN_SR_2P_TX_LP			BIT(13)
++#define GEN_SR_1P_TX_LP			BIT(12)
++#define GEN_SR_0P_TX_LP			BIT(11)
++#define GEN_SW_2P_TX_LP			BIT(10)
++#define GEN_SW_1P_TX_LP			BIT(9)
++#define GEN_SW_0P_TX_LP			BIT(8)
++#define ACK_RQST_EN			BIT(1)
++#define TEAR_FX_EN			BIT(0)
++
++#define CMD_MODE_ALL_LP			(MAX_RD_PKT_SIZE_LP | \
++					 DCS_LW_TX_LP | \
++					 DCS_SR_0P_TX_LP | \
++					 DCS_SW_1P_TX_LP | \
++					 DCS_SW_0P_TX_LP | \
++					 GEN_LW_TX_LP | \
++					 GEN_SR_2P_TX_LP | \
++					 GEN_SR_1P_TX_LP | \
++					 GEN_SR_0P_TX_LP | \
++					 GEN_SW_2P_TX_LP | \
++					 GEN_SW_1P_TX_LP | \
++					 GEN_SW_0P_TX_LP)
++
++#define DSI_GEN_HDR			0x6c
++#define DSI_GEN_PLD_DATA		0x70
++
++#define DSI_CMD_PKT_STATUS		0x74
++#define GEN_RD_CMD_BUSY			BIT(6)
++#define GEN_PLD_R_FULL			BIT(5)
++#define GEN_PLD_R_EMPTY			BIT(4)
++#define GEN_PLD_W_FULL			BIT(3)
++#define GEN_PLD_W_EMPTY			BIT(2)
++#define GEN_CMD_FULL			BIT(1)
++#define GEN_CMD_EMPTY			BIT(0)
++
++#define DSI_TO_CNT_CFG			0x78
++#define HSTX_TO_CNT(p)			(((p) & 0xffff) << 16)
++#define LPRX_TO_CNT(p)			((p) & 0xffff)
++
++#define DSI_HS_RD_TO_CNT		0x7c
++#define DSI_LP_RD_TO_CNT		0x80
++#define DSI_HS_WR_TO_CNT		0x84
++#define DSI_LP_WR_TO_CNT		0x88
++#define DSI_BTA_TO_CNT			0x8c
++
++#define DSI_LPCLK_CTRL			0x94
++#define AUTO_CLKLANE_CTRL		BIT(1)
++#define PHY_TXREQUESTCLKHS		BIT(0)
++
++#define DSI_PHY_TMR_LPCLK_CFG		0x98
++#define PHY_CLKHS2LP_TIME(lbcc)		(((lbcc) & 0x3ff) << 16)
++#define PHY_CLKLP2HS_TIME(lbcc)		((lbcc) & 0x3ff)
++
++#define DSI_PHY_TMR_CFG			0x9c
++#define PHY_HS2LP_TIME(lbcc)		(((lbcc) & 0xff) << 24)
++#define PHY_LP2HS_TIME(lbcc)		(((lbcc) & 0xff) << 16)
++#define MAX_RD_TIME(lbcc)		((lbcc) & 0x7fff)
++#define PHY_HS2LP_TIME_V131(lbcc)	(((lbcc) & 0x3ff) << 16)
++#define PHY_LP2HS_TIME_V131(lbcc)	((lbcc) & 0x3ff)
++
++#define DSI_PHY_RSTZ			0xa0
++#define PHY_DISFORCEPLL			0
++#define PHY_ENFORCEPLL			BIT(3)
++#define PHY_DISABLECLK			0
++#define PHY_ENABLECLK			BIT(2)
++#define PHY_RSTZ			0
++#define PHY_UNRSTZ			BIT(1)
++#define PHY_SHUTDOWNZ			0
++#define PHY_UNSHUTDOWNZ			BIT(0)
++
++#define DSI_PHY_IF_CFG			0xa4
++#define PHY_STOP_WAIT_TIME(cycle)	(((cycle) & 0xff) << 8)
++#define N_LANES(n)			(((n) - 1) & 0x3)
++
++#define DSI_PHY_ULPS_CTRL		0xa8
++#define DSI_PHY_TX_TRIGGERS		0xac
++
++#define DSI_PHY_STATUS			0xb0
++#define PHY_STOP_STATE_CLK_LANE		BIT(2)
++#define PHY_LOCK			BIT(0)
++
++#define DSI_PHY_TST_CTRL0		0xb4
++#define PHY_TESTCLK			BIT(1)
++#define PHY_UNTESTCLK			0
++#define PHY_TESTCLR			BIT(0)
++#define PHY_UNTESTCLR			0
++
++#define DSI_PHY_TST_CTRL1		0xb8
++#define PHY_TESTEN			BIT(16)
++#define PHY_UNTESTEN			0
++#define PHY_TESTDOUT(n)			(((n) & 0xff) << 8)
++#define PHY_TESTDIN(n)			((n) & 0xff)
++
++#define DSI_INT_ST0			0xbc
++#define DSI_INT_ST1			0xc0
++#define DSI_INT_MSK0			0xc4
++#define DSI_INT_MSK1			0xc8
++
++#define DSI_PHY_TMR_RD_CFG		0xf4
++#define MAX_RD_TIME_V131(lbcc)		((lbcc) & 0x7fff)
++
++#define PHY_STATUS_TIMEOUT_US		10000
++#define CMD_PKT_STATUS_TIMEOUT_US	20000
++
++#define MSEC_PER_SEC			1000
++
++static int dsi_mode_vrefresh(struct display_timing *timings)
++{
++	int refresh = 0;
++	unsigned int calc_val;
++	u32 htotal = timings->hactive.typ + timings->hfront_porch.typ +
++		     timings->hback_porch.typ + timings->hsync_len.typ;
++	u32 vtotal = timings->vactive.typ + timings->vfront_porch.typ +
++		     timings->vback_porch.typ + timings->vsync_len.typ;
++
++	if (htotal > 0 && vtotal > 0) {
++		calc_val = timings->pixelclock.typ;
++		calc_val /= htotal;
++		refresh = (calc_val + vtotal / 2) / vtotal;
++	}
++
++	return refresh;
++}
++
++/*
++ * The controller should generate 2 frames before
++ * preparing the peripheral.
++ */
++static void dw_mipi_dsi_wait_for_two_frames(struct display_timing *timings)
++{
++	int refresh, two_frames;
++
++	refresh = dsi_mode_vrefresh(timings);
++	two_frames = DIV_ROUND_UP(MSEC_PER_SEC, refresh) * 2;
++	mdelay(two_frames);
++}
++
++static inline struct dw_mipi_dsi *host_to_dsi(struct mipi_dsi_host *host)
++{
++	return container_of(host, struct dw_mipi_dsi, dsi_host);
++}
++
++static inline void dsi_write(struct dw_mipi_dsi *dsi, u32 reg, u32 val)
++{
++	writel(val, dsi->base + reg);
++}
++
++static inline u32 dsi_read(struct dw_mipi_dsi *dsi, u32 reg)
++{
++	return readl(dsi->base + reg);
++}
++
++static int dw_mipi_dsi_host_attach(struct mipi_dsi_host *host,
++				   struct mipi_dsi_device *device)
++{
++	struct dw_mipi_dsi *dsi = host_to_dsi(host);
++
++	if (device->lanes > dsi->max_data_lanes) {
++		dev_err(device->dev,
++			"the number of data lanes(%u) is too many\n",
++			device->lanes);
++		return -EINVAL;
++	}
++
++	dsi->channel = device->channel;
++
++	return 0;
++}
++
++static void dw_mipi_message_config(struct dw_mipi_dsi *dsi,
++				   const struct mipi_dsi_msg *msg)
++{
++	bool lpm = msg->flags & MIPI_DSI_MSG_USE_LPM;
++	u32 val = 0;
++
++	/*
++	 * TODO dw drv improvements
++	 * largest packet sizes during hfp or during vsa/vpb/vfp
++	 * should be computed according to byte lane, lane number and only
++	 * if sending lp cmds in high speed is enable (PHY_TXREQUESTCLKHS)
++	 */
++	dsi_write(dsi, DSI_DPI_LP_CMD_TIM, OUTVACT_LPCMD_TIME(16)
++		  | INVACT_LPCMD_TIME(4));
++
++	if (msg->flags & MIPI_DSI_MSG_REQ_ACK)
++		val |= ACK_RQST_EN;
++	if (lpm)
++		val |= CMD_MODE_ALL_LP;
++
++	dsi_write(dsi, DSI_CMD_MODE_CFG, val);
++
++	val = dsi_read(dsi, DSI_VID_MODE_CFG);
++	if (lpm)
++		val |= ENABLE_LOW_POWER_CMD;
++	else
++		val &= ~ENABLE_LOW_POWER_CMD;
++	dsi_write(dsi, DSI_VID_MODE_CFG, val);
++
++}
++
++static int dw_mipi_dsi_gen_pkt_hdr_write(struct dw_mipi_dsi *dsi, u32 hdr_val)
++{
++	int ret;
++	u32 val, mask;
++
++	ret = readl_poll_timeout(dsi->base + DSI_CMD_PKT_STATUS,
++				 val, !(val & GEN_CMD_FULL),
++				 CMD_PKT_STATUS_TIMEOUT_US);
++	if (ret) {
++		dev_err(dsi->dev, "failed to get available command FIFO\n");
++		return ret;
++	}
++
++	dsi_write(dsi, DSI_GEN_HDR, hdr_val);
++
++	mask = GEN_CMD_EMPTY | GEN_PLD_W_EMPTY;
++	ret = readl_poll_timeout(dsi->base + DSI_CMD_PKT_STATUS,
++				 val, (val & mask) == mask,
++				 CMD_PKT_STATUS_TIMEOUT_US);
++	if (ret) {
++		dev_err(dsi->dev, "failed to write command FIFO\n");
++		return ret;
++	}
++
++	return 0;
++}
++
++static int dw_mipi_dsi_write(struct dw_mipi_dsi *dsi,
++			     const struct mipi_dsi_packet *packet)
++{
++	const u8 *tx_buf = packet->payload;
++	int len = packet->payload_length, pld_data_bytes = sizeof(u32), ret;
++	__le32 word;
++	u32 val;
++
++	while (len) {
++		if (len < pld_data_bytes) {
++			word = 0;
++			memcpy(&word, tx_buf, len);
++			dsi_write(dsi, DSI_GEN_PLD_DATA, le32_to_cpu(word));
++			len = 0;
++		} else {
++			memcpy(&word, tx_buf, pld_data_bytes);
++			dsi_write(dsi, DSI_GEN_PLD_DATA, le32_to_cpu(word));
++			tx_buf += pld_data_bytes;
++			len -= pld_data_bytes;
++		}
++
++		ret = readl_poll_timeout(dsi->base + DSI_CMD_PKT_STATUS,
++					 val, !(val & GEN_PLD_W_FULL),
++					 CMD_PKT_STATUS_TIMEOUT_US);
++		if (ret) {
++			dev_err(dsi->dev,
++				"failed to get available write payload FIFO\n");
++			return ret;
++		}
++	}
++
++	word = 0;
++	memcpy(&word, packet->header, sizeof(packet->header));
++	return dw_mipi_dsi_gen_pkt_hdr_write(dsi, le32_to_cpu(word));
++}
++
++static int dw_mipi_dsi_read(struct dw_mipi_dsi *dsi,
++			    const struct mipi_dsi_msg *msg)
++{
++	int i, j, ret, len = msg->rx_len;
++	u8 *buf = msg->rx_buf;
++	u32 val;
++
++	/* Wait end of the read operation */
++	ret = readl_poll_timeout(dsi->base + DSI_CMD_PKT_STATUS,
++				 val, !(val & GEN_RD_CMD_BUSY),
++				 CMD_PKT_STATUS_TIMEOUT_US);
++	if (ret) {
++		dev_err(dsi->dev, "Timeout during read operation\n");
++		return ret;
++	}
++
++	for (i = 0; i < len; i += 4) {
++		/* Read fifo must not be empty before all bytes are read */
++		ret = readl_poll_timeout(dsi->base + DSI_CMD_PKT_STATUS,
++					 val, !(val & GEN_PLD_R_EMPTY),
++					 CMD_PKT_STATUS_TIMEOUT_US);
++		if (ret) {
++			dev_err(dsi->dev, "Read payload FIFO is empty\n");
++			return ret;
++		}
++
++		val = dsi_read(dsi, DSI_GEN_PLD_DATA);
++		for (j = 0; j < 4 && j + i < len; j++)
++			buf[i + j] = val >> (8 * j);
++	}
++
++	return ret;
++}
++
++static ssize_t dw_mipi_dsi_host_transfer(struct mipi_dsi_host *host,
++					 const struct mipi_dsi_msg *msg)
++{
++	struct dw_mipi_dsi *dsi = host_to_dsi(host);
++	struct mipi_dsi_packet packet;
++	int ret, nb_bytes;
++
++	ret = mipi_dsi_create_packet(&packet, msg);
++	if (ret) {
++		dev_err(dsi->dev, "failed to create packet: %d\n", ret);
++		return ret;
++	}
++
++	dw_mipi_message_config(dsi, msg);
++
++	ret = dw_mipi_dsi_write(dsi, &packet);
++	if (ret)
++		return ret;
++
++	if (msg->rx_buf && msg->rx_len) {
++		ret = dw_mipi_dsi_read(dsi, msg);
++		if (ret)
++			return ret;
++		nb_bytes = msg->rx_len;
++	} else {
++		nb_bytes = packet.size;
++	}
++
++	return nb_bytes;
++}
++
++static const struct mipi_dsi_host_ops dw_mipi_dsi_host_ops = {
++	.attach = dw_mipi_dsi_host_attach,
++	.transfer = dw_mipi_dsi_host_transfer,
++};
++
++static void dw_mipi_dsi_video_mode_config(struct dw_mipi_dsi *dsi)
++{
++	struct mipi_dsi_device *device = dsi->device;
++	u32 val;
++
++	/*
++	 * TODO dw drv improvements
++	 * enabling low power is panel-dependent, we should use the
++	 * panel configuration here...
++	 */
++	val = ENABLE_LOW_POWER;
++
++	if (device->mode_flags & MIPI_DSI_MODE_VIDEO_BURST)
++		val |= VID_MODE_TYPE_BURST;
++	else if (device->mode_flags & MIPI_DSI_MODE_VIDEO_SYNC_PULSE)
++		val |= VID_MODE_TYPE_NON_BURST_SYNC_PULSES;
++	else
++		val |= VID_MODE_TYPE_NON_BURST_SYNC_EVENTS;
++
++	dsi_write(dsi, DSI_VID_MODE_CFG, val);
++}
++
++static void dw_mipi_dsi_set_mode(struct dw_mipi_dsi *dsi,
++				 unsigned long mode_flags)
++{
++	u32 val;
++	const struct mipi_dsi_phy_ops *phy_ops = dsi->phy_ops;
++
++	dsi_write(dsi, DSI_PWR_UP, RESET);
++
++	if (mode_flags & MIPI_DSI_MODE_VIDEO) {
++		dsi_write(dsi, DSI_MODE_CFG, ENABLE_VIDEO_MODE);
++		dw_mipi_dsi_video_mode_config(dsi);
++		dsi_write(dsi, DSI_LPCLK_CTRL, PHY_TXREQUESTCLKHS);
++	} else {
++		dsi_write(dsi, DSI_MODE_CFG, ENABLE_CMD_MODE);
++	}
++
++	val = PHY_TXREQUESTCLKHS;
++	if (mode_flags & MIPI_DSI_CLOCK_NON_CONTINUOUS)
++		val |= AUTO_CLKLANE_CTRL;
++	dsi_write(dsi, DSI_LPCLK_CTRL, val);
++
++	if (phy_ops->post_set_mode)
++		phy_ops->post_set_mode(dsi->device, mode_flags);
++
++	dsi_write(dsi, DSI_PWR_UP, POWERUP);
++}
++
++static void dw_mipi_dsi_init_pll(struct dw_mipi_dsi *dsi)
++{
++	/*
++	 * The maximum permitted escape clock is 20MHz and it is derived from
++	 * lanebyteclk, which is running at "lane_mbps / 8".  Thus we want:
++	 *
++	 *     (lane_mbps >> 3) / esc_clk_division < 20
++	 * which is:
++	 *     (lane_mbps >> 3) / 20 > esc_clk_division
++	 */
++	u32 esc_clk_division = (dsi->lane_mbps >> 3) / 20 + 1;
++
++	dsi_write(dsi, DSI_PWR_UP, RESET);
++
++	/*
++	 * TODO dw drv improvements
++	 * timeout clock division should be computed with the
++	 * high speed transmission counter timeout and byte lane...
++	 */
++	dsi_write(dsi, DSI_CLKMGR_CFG, TO_CLK_DIVISION(10) |
++		  TX_ESC_CLK_DIVISION(esc_clk_division));
++}
++
++static void dw_mipi_dsi_dpi_config(struct dw_mipi_dsi *dsi,
++				   struct display_timing *timings)
++{
++	struct mipi_dsi_device *device = dsi->device;
++	u32 val = 0, color = 0;
++
++	switch (device->format) {
++	case MIPI_DSI_FMT_RGB888:
++		color = DPI_COLOR_CODING_24BIT;
++		break;
++	case MIPI_DSI_FMT_RGB666:
++		color = DPI_COLOR_CODING_18BIT_2 | LOOSELY18_EN;
++		break;
++	case MIPI_DSI_FMT_RGB666_PACKED:
++		color = DPI_COLOR_CODING_18BIT_1;
++		break;
++	case MIPI_DSI_FMT_RGB565:
++		color = DPI_COLOR_CODING_16BIT_1;
++		break;
++	}
++
++	if (timings->flags & DISPLAY_FLAGS_VSYNC_HIGH)
++		val |= VSYNC_ACTIVE_LOW;
++	if (timings->flags & DISPLAY_FLAGS_HSYNC_HIGH)
++		val |= HSYNC_ACTIVE_LOW;
++
++	dsi_write(dsi, DSI_DPI_VCID, DPI_VCID(dsi->channel));
++	dsi_write(dsi, DSI_DPI_COLOR_CODING, color);
++	dsi_write(dsi, DSI_DPI_CFG_POL, val);
++}
++
++static void dw_mipi_dsi_packet_handler_config(struct dw_mipi_dsi *dsi)
++{
++	dsi_write(dsi, DSI_PCKHDL_CFG, CRC_RX_EN | ECC_RX_EN | BTA_EN);
++}
++
++static void dw_mipi_dsi_video_packet_config(struct dw_mipi_dsi *dsi,
++					    struct display_timing *timings)
++{
++	/*
++	 * TODO dw drv improvements
++	 * only burst mode is supported here. For non-burst video modes,
++	 * we should compute DSI_VID_PKT_SIZE, DSI_VCCR.NUMC &
++	 * DSI_VNPCR.NPSIZE... especially because this driver supports
++	 * non-burst video modes, see dw_mipi_dsi_video_mode_config()...
++	 */
++	dsi_write(dsi, DSI_VID_PKT_SIZE, VID_PKT_SIZE(timings->hactive.typ));
++}
++
++static void dw_mipi_dsi_command_mode_config(struct dw_mipi_dsi *dsi)
++{
++	const struct mipi_dsi_phy_ops *phy_ops = dsi->phy_ops;
++
++	/*
++	 * TODO dw drv improvements
++	 * compute high speed transmission counter timeout according
++	 * to the timeout clock division (TO_CLK_DIVISION) and byte lane...
++	 */
++	dsi_write(dsi, DSI_TO_CNT_CFG, HSTX_TO_CNT(0) | LPRX_TO_CNT(0));
++	/*
++	 * TODO dw drv improvements
++	 * the Bus-Turn-Around Timeout Counter should be computed
++	 * according to byte lane...
++	 */
++	dsi_write(dsi, DSI_BTA_TO_CNT, 0xd00);
++	dsi_write(dsi, DSI_MODE_CFG, ENABLE_CMD_MODE);
++
++	if (phy_ops->post_set_mode)
++		phy_ops->post_set_mode(dsi->device, 0);
++}
++
++/* Get lane byte clock cycles. */
++static u32 dw_mipi_dsi_get_hcomponent_lbcc(struct dw_mipi_dsi *dsi,
++					   struct display_timing *timings,
++					   u32 hcomponent)
++{
++	u32 frac, lbcc;
++
++	lbcc = hcomponent * dsi->lane_mbps * MSEC_PER_SEC / 8;
++
++	frac = lbcc % (timings->pixelclock.typ / 1000);
++	lbcc = lbcc / (timings->pixelclock.typ / 1000);
++	if (frac)
++		lbcc++;
++
++	return lbcc;
++}
++
++static void dw_mipi_dsi_line_timer_config(struct dw_mipi_dsi *dsi,
++					  struct display_timing *timings)
++{
++	u32 htotal, hsa, hbp, lbcc;
++
++	htotal = timings->hactive.typ + timings->hfront_porch.typ +
++		 timings->hback_porch.typ + timings->hsync_len.typ;
++
++	hbp = timings->hback_porch.typ;
++	hsa = timings->hsync_len.typ;
++
++	/*
++	 * TODO dw drv improvements
++	 * computations below may be improved...
++	 */
++	lbcc = dw_mipi_dsi_get_hcomponent_lbcc(dsi, timings, htotal);
++	dsi_write(dsi, DSI_VID_HLINE_TIME, lbcc);
++
++	lbcc = dw_mipi_dsi_get_hcomponent_lbcc(dsi, timings, hsa);
++	dsi_write(dsi, DSI_VID_HSA_TIME, lbcc);
++
++	lbcc = dw_mipi_dsi_get_hcomponent_lbcc(dsi, timings, hbp);
++	dsi_write(dsi, DSI_VID_HBP_TIME, lbcc);
++}
++
++static void dw_mipi_dsi_vertical_timing_config(struct dw_mipi_dsi *dsi,
++					       struct display_timing *timings)
++{
++	u32 vactive, vsa, vfp, vbp;
++
++	vactive = timings->vactive.typ;
++	vbp =  timings->vback_porch.typ;
++	vfp =  timings->vfront_porch.typ;
++	vsa = timings->vsync_len.typ;
++
++	dsi_write(dsi, DSI_VID_VACTIVE_LINES, vactive);
++	dsi_write(dsi, DSI_VID_VSA_LINES, vsa);
++	dsi_write(dsi, DSI_VID_VFP_LINES, vfp);
++	dsi_write(dsi, DSI_VID_VBP_LINES, vbp);
++}
++
++static void dw_mipi_dsi_dphy_timing_config(struct dw_mipi_dsi *dsi)
++{
++	u32 hw_version;
++	struct dw_mipi_dsi_dphy_timing *timing = &dsi->dphy_timing;
++
++	/*
++	 * TODO dw drv improvements
++	 * data & clock lane timers should be computed according to panel
++	 * blankings and to the automatic clock lane control mode...
++	 * note: DSI_PHY_TMR_CFG.MAX_RD_TIME should be in line with
++	 * DSI_CMD_MODE_CFG.MAX_RD_PKT_SIZE_LP (see CMD_MODE_ALL_LP)
++	 */
++
++	hw_version = dsi_read(dsi, DSI_VERSION) & VERSION;
++
++	if (1 || hw_version >= HWVER_131) {
++		dsi_write(dsi, DSI_PHY_TMR_CFG,
++			  PHY_HS2LP_TIME_V131(timing->data_hs2lp) |
++			  PHY_LP2HS_TIME_V131(timing->data_lp2hs));
++		dsi_write(dsi, DSI_PHY_TMR_RD_CFG, MAX_RD_TIME_V131(10000));
++	} else {
++		dsi_write(dsi, DSI_PHY_TMR_CFG,
++			  PHY_HS2LP_TIME(timing->data_hs2lp) |
++			  PHY_LP2HS_TIME(timing->data_lp2hs) |
++			  MAX_RD_TIME(10000));
++	}
++
++	dsi_write(dsi, DSI_PHY_TMR_LPCLK_CFG,
++		  PHY_CLKHS2LP_TIME(timing->clk_hs2lp) |
++		  PHY_CLKLP2HS_TIME(timing->clk_lp2hs));
++}
++
++static void dw_mipi_dsi_dphy_interface_config(struct dw_mipi_dsi *dsi)
++{
++	struct mipi_dsi_device *device = dsi->device;
++
++	/*
++	 * TODO dw drv improvements
++	 * stop wait time should be the maximum between host dsi
++	 * and panel stop wait times
++	 */
++	dsi_write(dsi, DSI_PHY_IF_CFG, PHY_STOP_WAIT_TIME(0x20) |
++		  N_LANES(device->lanes));
++}
++
++static void dw_mipi_dsi_dphy_init(struct dw_mipi_dsi *dsi)
++{
++	/* Clear PHY state */
++	dsi_write(dsi, DSI_PHY_RSTZ, PHY_DISFORCEPLL | PHY_DISABLECLK
++		  | PHY_RSTZ | PHY_SHUTDOWNZ);
++	dsi_write(dsi, DSI_PHY_TST_CTRL0, PHY_UNTESTCLR);
++	dsi_write(dsi, DSI_PHY_TST_CTRL0, PHY_TESTCLR);
++	dsi_write(dsi, DSI_PHY_TST_CTRL0, PHY_UNTESTCLR);
++}
++
++static void dw_mipi_dsi_dphy_enable(struct dw_mipi_dsi *dsi)
++{
++	u32 val;
++	int ret;
++
++	dsi_write(dsi, DSI_PHY_RSTZ, PHY_ENFORCEPLL | PHY_ENABLECLK |
++		  PHY_UNRSTZ | PHY_UNSHUTDOWNZ);
++
++	ret = readl_poll_timeout(dsi->base + DSI_PHY_STATUS, val,
++				 val & PHY_LOCK, PHY_STATUS_TIMEOUT_US);
++	if (ret)
++		dev_warn(dsi->dev, "failed to wait phy lock state\n");
++
++	ret = readl_poll_timeout(dsi->base + DSI_PHY_STATUS,
++				 val, val & PHY_STOP_STATE_CLK_LANE,
++				 PHY_STATUS_TIMEOUT_US);
++	if (ret)
++		dev_warn(dsi->dev, "failed to wait phy clk lane stop state\n");
++}
++
++static void dw_mipi_dsi_clear_err(struct dw_mipi_dsi *dsi)
++{
++	dsi_read(dsi, DSI_INT_ST0);
++	dsi_read(dsi, DSI_INT_ST1);
++	dsi_write(dsi, DSI_INT_MSK0, 0);
++	dsi_write(dsi, DSI_INT_MSK1, 0);
++}
++
++static void dw_mipi_dsi_bridge_set(struct dw_mipi_dsi *dsi,
++				   struct display_timing *timings)
++{
++	const struct mipi_dsi_phy_ops *phy_ops = dsi->phy_ops;
++	int ret;
++
++	dw_mipi_dsi_init_pll(dsi);
++	dw_mipi_dsi_dpi_config(dsi, timings);
++	dw_mipi_dsi_packet_handler_config(dsi);
++	dw_mipi_dsi_video_mode_config(dsi);
++	dw_mipi_dsi_video_packet_config(dsi, timings);
++	dw_mipi_dsi_command_mode_config(dsi);
++	dw_mipi_dsi_line_timer_config(dsi, timings);
++	dw_mipi_dsi_vertical_timing_config(dsi, timings);
++
++	dw_mipi_dsi_dphy_init(dsi);
++	dw_mipi_dsi_dphy_timing_config(dsi);
++	dw_mipi_dsi_dphy_interface_config(dsi);
++
++	dw_mipi_dsi_clear_err(dsi);
++
++	ret = phy_ops->init(dsi->device);
++	if (ret)
++		dev_warn(dsi->dev, "Phy init() failed\n");
++
++	dw_mipi_dsi_dphy_enable(dsi);
++
++	dw_mipi_dsi_wait_for_two_frames(timings);
++
++	/* Switch to cmd mode for panel-bridge pre_enable & panel prepare */
++	dw_mipi_dsi_set_mode(dsi, 0);
++}
++
++static int dw_mipi_dsi_timing_fixup(struct dw_mipi_dsi *dsi,
++				struct display_timing *timings,
++				struct display_timing *adjusted_timings)
++{
++	int ret;
++	u32 tmp, lbcc, htotal, vtotal, adjusted_vtotal, clk_khz, adjusted_clk_khz;
++	const struct mipi_dsi_phy_ops *phy_ops = dsi->phy_ops;
++	struct mipi_dsi_device *device = dsi->device;
++
++	ret = phy_ops->get_lane_mbps(dsi->device, timings, device->lanes,
++				     device->format, &dsi->lane_mbps);
++	if (ret) {
++		dev_warn(dsi->dev, "Phy get_lane_mbps() failed\n");
++		return -EINVAL;
++	}
++
++	if (!(device->mode_flags & MIPI_DSI_MODE_VIDEO_BURST)) {
++		clk_khz = timings->pixelclock.typ / 1000;
++		vtotal = timings->vactive.typ + timings->vfront_porch.typ +
++			 timings->vback_porch.typ + timings->vsync_len.typ;
++		htotal = timings->hactive.typ + timings->hfront_porch.typ +
++			 timings->hback_porch.typ + timings->hsync_len.typ;
++		lbcc = dw_mipi_dsi_get_hcomponent_lbcc(dsi, timings, htotal);
++		tmp = htotal * dsi->lane_mbps * MSEC_PER_SEC / 8;
++		adjusted_clk_khz = tmp / lbcc;
++		if (tmp % lbcc)
++			adjusted_clk_khz += 1;
++
++		tmp = (adjusted_clk_khz * vtotal) + (clk_khz + 1) / 2;
++		adjusted_vtotal = tmp / clk_khz;
++		if (adjusted_vtotal < vtotal) {
++			tmp = vtotal - adjusted_vtotal;
++			if (tmp < timings->vback_porch.typ) {
++				adjusted_timings->vback_porch.typ -= tmp;
++			} else if (tmp < timings->vsync_len.typ) {
++				adjusted_timings->vsync_len.typ -= tmp;
++			} else if (tmp < timings->vfront_porch.typ) {
++				adjusted_timings->vfront_porch.typ -= tmp;
++			} else {
++				dev_err(dsi->dev, "reduced rows:%d failed for adjusted_timings\n", tmp);
++				return -EINVAL;
++			}
++
++			adjusted_timings->pixelclock.typ = adjusted_clk_khz * 1000;
++		}
++	}
++
++	adjusted_timings->flags = DISPLAY_FLAGS_HSYNC_HIGH | DISPLAY_FLAGS_VSYNC_HIGH | DISPLAY_FLAGS_DE_HIGH;
++
++	return 0;
++}
++
++int dw_mipi_dsi_init(struct dw_mipi_dsi *dsi, struct mipi_dsi_device *device,
++			  struct display_timing *timings, struct display_timing *adjusted_timings,
++			  unsigned max_data_lanes, const struct mipi_dsi_phy_ops *phy_ops)
++{
++	int ret;
++
++	if (!phy_ops->init || !phy_ops->get_lane_mbps) {
++		dev_err(device->dev, "Phy not properly configured\n");
++		return -ENODEV;
++	}
++
++	dsi->phy_ops = phy_ops;
++	dsi->max_data_lanes = max_data_lanes;
++	dsi->device = device;
++	dsi->dsi_host.ops = &dw_mipi_dsi_host_ops;
++	device->host = &dsi->dsi_host;
++
++	ret = dw_mipi_dsi_timing_fixup(dsi, timings, adjusted_timings);
++	if (ret)
++		return ret;
++
++	dw_mipi_dsi_bridge_set(dsi, adjusted_timings);
++
++	return 0;
++}
++
++int dw_mipi_dsi_enable(struct dw_mipi_dsi *dsi)
++{
++	/* Switch to video mode for panel-bridge enable & panel enable */
++	dw_mipi_dsi_set_mode(dsi, MIPI_DSI_MODE_VIDEO);
++
++	return 0;
++}
++
+diff --git a/drivers/video/axera/dw_mipi_dsi.h b/drivers/video/axera/dw_mipi_dsi.h
+new file mode 100644
+index 00000000..bbd1807f
+--- /dev/null
++++ b/drivers/video/axera/dw_mipi_dsi.h
+@@ -0,0 +1,39 @@
++/**************************************************************************************************
++ *
++ * Copyright (c) 2019-2024 Axera Semiconductor Co., Ltd. All Rights Reserved.
++ *
++ * This source file is the property of Axera Semiconductor Co., Ltd. and
++ * may not be copied or distributed in any isomorphic form without the prior
++ * written consent of Axera Semiconductor Co., Ltd.
++ *
++ **************************************************************************************************/
++
++#ifndef _DW_MIPI_DSI_H
++#define _DW_MIPI_DSI_H
++
++#include <mipi_dsi.h>
++
++struct dw_mipi_dsi_dphy_timing {
++	u16 data_hs2lp;
++	u16 data_lp2hs;
++	u16 clk_hs2lp;
++	u16 clk_lp2hs;
++};
++
++struct dw_mipi_dsi {
++	struct mipi_dsi_host dsi_host;
++	struct mipi_dsi_device *device;
++	void __iomem *base;
++	unsigned int lane_mbps; /* per lane */
++	u32 channel;
++	unsigned int max_data_lanes;
++	const struct mipi_dsi_phy_ops *phy_ops;
++	struct dw_mipi_dsi_dphy_timing dphy_timing;
++};
++
++int dw_mipi_dsi_init(struct dw_mipi_dsi *dsi, struct mipi_dsi_device *device,
++			  struct display_timing *timings, struct display_timing *adjusted_timings,
++			  unsigned max_data_lanes, const struct mipi_dsi_phy_ops *phy_ops);
++int dw_mipi_dsi_enable(struct dw_mipi_dsi *dsi);
++
++#endif /* _DW_MIPI_DSI_H */
+\ No newline at end of file
 diff --git a/drivers/video/axera/stb_image.h b/drivers/video/axera/stb_image.h
 new file mode 100644
 index 00000000..befd65a7
@@ -262896,10 +264603,10 @@ index 00000000..7d816275
 +#endif
 diff --git a/include/configs/ax650_common.h b/include/configs/ax650_common.h
 new file mode 100755
-index 00000000..1dcf1564
+index 00000000..6dc69787
 --- /dev/null
 +++ b/include/configs/ax650_common.h
-@@ -0,0 +1,367 @@
+@@ -0,0 +1,372 @@
 +/*
 + * (C) Copyright 2020 AXERA
 + *
@@ -262939,9 +264646,14 @@ index 00000000..1dcf1564
 +
 +#define HDMI_DEV_NR 2
 +#define AX_DW_HDMI0_BASE_ADDR 0x10030000
-+#define AX_VO_HDMI1_BASE_ADDR 0x10040000
++#define AX_DW_HDMI1_BASE_ADDR 0x10040000
 +
++#define AX_DW_MIPI_DSI_BASE_ADDR 0x10060000
++
++#define MM_SYS_GLB_BASE_ADDR 0x10000000
 +#define MM_CK_BASE_ADDR 0x10010000
++#define DPHY_SYS_BASE_ADDR 0x10013000
++#define MM_PHY_CK_RST_BASE_ADDR 0x10014000
 +#define AON_SYS_PLL_BASE_ADDR 0x4E10000
 +
 +/* FAT sd card locations. */
