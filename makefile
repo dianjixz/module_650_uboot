@@ -134,7 +134,8 @@ $(UBOOT_TAR) : README.md
 AXERA_TOOLS_PATH := $(THIS_DIR)/axerabin/tools/bin
 BINARIES_DIR := $(SRC_DIR)
 OUT_BINARIES_DIR := $(SRC_DIR)/..
-include $(AXERA_TOOLS_PATH)/BuildEnv.mk
+ifneq ($(wildcard $(AXERA_TOOLS_PATH)/ax650n_BuildEnv.mk),)
+include $(AXERA_TOOLS_PATH)/ax650n_BuildEnv.mk
 
 Packaxera: 
 	openssl aes-256-ecb -e -in $(BINARIES_DIR)/u-boot.bin -out $(OUT_BINARIES_DIR)/u-boot_enc.bin -K 00000000000000000000000000000000 -nosalt -p
@@ -149,6 +150,10 @@ Packaxera:
 	python3 $(AXERA_TOOLS_SIGN_SCRIPT_650_FDL) -i $(BINARIES_DIR)/u-boot.bin \
 		-o $(OUT_BINARIES_DIR)/fdl2_signed.bin -pub $(AXERA_TOOLS_PUB_KEY) -prv $(AXERA_TOOLS_PRIV_KEY) \
 		-fw $(AXERA_TOOLS_PATH)/imgsign/eip.bin  $(AXERA_TOOLS_SIGN_PARAMS_650_UBOOT)
+else
+Packaxera: 
+        @echo "Axera signing tools not found. Skipping signing step."
+endif
 
 linux-distclean:
 	@$(KERNEL_MAKE) distclean
