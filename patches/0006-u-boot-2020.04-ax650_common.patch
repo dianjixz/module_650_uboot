@@ -1,0 +1,49 @@
+diff --git a/uboot/u-boot-2020.04/include/configs/ax650_emmc.h b/uboot/u-boot-2020.04/include/configs/ax650_emmc.h
+index 3413084e..d9c2cb5f 100755
+--- a/include/configs/ax650_emmc.h
++++ b/include/configs/ax650_emmc.h
+@@ -51,14 +51,16 @@
+ #undef BOOTARGS_EMMC
+ #endif
+ 
++#ifndef ROOTFS_PARTITION_SIZE
++#define ROOTFS_PARTITION_SIZE   "30380032K"
++#endif
++
+ #define RECOVERY_ROOTFS_PART   "/dev/mmcblk0p12"
+ 
+ #define EMMCPARTS_RECOVERY	EMMCPARTS_DEFAULT_POST \
+     "1M(recovery_dtb)," \
+     "74M(recovery)," \
+-    "4736M(rootfs)," \
+-    "384M(soc)," \
+-    "1900M(opt)," \
++    ROOTFS_PARTITION_SIZE"(rootfs)"
+ 
+ #define BOOTARGS_EMMC BOOTARGS_EMMC_NO_PART \
+ 				RECOVERY_ROOTFS_PART \
+@@ -69,6 +71,12 @@
+ 
+ #define RECOVERY_BOOTARGS BOOTARGS_EMMC_RECOVERY_NO_PART \
+ 				EMMCPARTS_RECOVERY
++
++
++#define CONFIG_EXTRA_ENV_SETTINGS		\
++	"seti2c0m=mw 0x4250688 0x4001\0" \
++	"before_boot_cmd=run seti2c0m\0" \
++
+ #endif
+ 
+ #endif
+diff --git a/uboot/u-boot-2020.04/include/configs/ax650_common.h b/uboot/u-boot-2020.04/include/configs/ax650_common.h
+index 6dc69787..efa9a448 100755
+--- a/include/configs/ax650_common.h
++++ b/include/configs/ax650_common.h
+@@ -368,5 +368,7 @@ mtdparts=spi5.0:4M(uboot),768K(env),1M(atf),1M(dtb),32M(kernel),512K(param),192M
+ 	"     setenv bootpart A; " \
+ 	"  fi; setenv bootcount 0; saveenv; " \
+ 	"  run bootcmd\0" \
++	"seti2c0m=mw 0x4250688 0x4001\0" \
++	"before_boot_cmd=run seti2c0m\0" \
+ 
+ #endif

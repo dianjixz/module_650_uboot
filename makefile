@@ -75,7 +75,7 @@ KERNEL_MAKE := +$(MAKE) -C $(SRC_DIR)  dtb-y=m5stack-ax650.dtb DEVICE_TREE=m5sta
 # ============================================================================
 # 主要目标
 # ============================================================================
-SIGN_EXTS := all install %_defconfig oldconfig %.bin u-boot
+SIGN_EXTS := all install %_defconfig oldconfig %.bin u-boot menuconfig
 
 define SIGN_RULE
 $(1): _build_init
