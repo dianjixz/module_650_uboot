@@ -1,13 +1,40 @@
---- a/drivers/ddr/axera/ddrc_init.h	2025-08-04 11:51:57.257850242 +0800
-+++ b/drivers/ddr/axera/ddrc_init.h	2025-08-04 12:01:03.248616063 +0800
-@@ -6,7 +6,7 @@
+--- a/drivers/ddr/axera/ddrc_init.h	2025-12-05 10:41:40.460511784 +0800
++++ b/drivers/ddr/axera/ddrc_init.h	2025-12-05 10:46:11.265832910 +0800
+@@ -6,7 +6,8 @@
   /* ddr wait time is 100ms*/
  #define DDR_WAIT_TIMEOUT 1000000
  static int dp_slp_en __attribute__((section(".data"))) = 0;
 -static int curr_rank_num __attribute__((section(".data"))) = 2;	//default dual rank
-+static int curr_rank_num __attribute__((section(".data"))) = 1;	//default dual rank
++static int curr_rank_num __attribute__((section(".data"))) = 2;	//default dual rank, will be modified in board_id
++static int use_ddr_size __attribute__((section(".data"))) = 4; //will be modified in board_id
  static int use_lpddr4 __attribute__((section(".data"))) = 0;	//default lpddr4x
  static int lpddr4x_6GB __attribute__((section(".data"))) = 0;
  static int lpddr4x_8GB __attribute__((section(".data"))) = 0;
-
+@@ -139,7 +140,10 @@
+ 		core_write_word(base_addr + DDRC_ADDRMAP4, 0x00001f1f);
+ 		core_write_word(base_addr + DDRC_ADDRMAP5, 0x08080808);
+ 		core_write_word(base_addr + DDRC_ADDRMAP6, 0x08080808);
+-		core_write_word(base_addr + DDRC_ADDRMAP7, 0x00000f0f);
++		if (use_ddr_size == 2)
++			core_write_word(base_addr + DDRC_ADDRMAP7, 0x00000f0f);
++		else if (use_ddr_size == 4)
++			core_write_word(base_addr + DDRC_ADDRMAP7, 0x00000f08);
+ 	}
+ }
  
+--- a/drivers/ddr/axera/ax650x_lpddr4x.c	2025-12-05 10:41:40.460511784 +0800
++++ a/drivers/ddr/axera/ax650x_lpddr4x.c	2025-12-05 10:40:44.151405226 +0800
+@@ -214,6 +214,13 @@
+ 	} else {
+ 		swap_mode = 2;
+ 	}
++	if(get_board_id() == AX650N_M5stack_4G){
++		curr_rank_num = 1;
++		use_ddr_size = 2;
++	}else if(get_board_id() == AX650N_M5stack_8G){
++		curr_rank_num = 2;
++		use_ddr_size = 4;
++	}
+ 	/* adc_read_boardid(1,&adc_data); //Users can read adc values to be compatible with different DDR types */
+ }
+ void mrw(u8 addr, u8 val, ulong umctl_base)

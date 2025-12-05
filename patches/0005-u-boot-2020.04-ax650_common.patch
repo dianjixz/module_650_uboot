@@ -47,3 +47,16 @@ index 6dc69787..efa9a448 100755
 +	"before_boot_cmd=run seti2c0m\0" \
  
  #endif
+--- a/cmd/axera/boot/axera_boot.c	2025-12-05 12:01:11.473407109 +0800
++++ b/cmd/axera/boot/axera_boot.c	2025-12-05 11:59:20.795244876 +0800
+@@ -327,6 +327,10 @@
+ 	const char *x_kernel = "kernel";
+ 	const char *x_dtb = "dtb";
+ 
++	char *axera_boot_after_cmd = env_get("before_boot_cmd");
++	if(NULL != axera_boot_after_cmd) 
++		run_command(axera_boot_after_cmd, 0);
++
+ #ifdef CONFIG_AXERA_SUPPORT_AB_OTA
+ 	char *bootpart = env_get("bootpart");
+ 

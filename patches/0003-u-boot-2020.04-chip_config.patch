@@ -1,0 +1,288 @@
+--- a/arch/arm/mach-axera/ax650/chip_config.c	2025-11-24 11:22:19.162341356 +0800
++++ b/arch/arm/mach-axera/ax650/chip_config.c	2025-11-24 11:22:19.206342063 +0800
+@@ -46,60 +46,60 @@
+ static int cpu_clk_set __attribute__((section(".data"))) = CPU_CLK_SET;
+ 
+ /* To get the ID of the chip type. */
+-static unsigned char hanming_decode_74(unsigned char  a)
+-{
+-	unsigned char b=0,c=0;
+-	b = a;
+-	c = 0;
+-	if(b&0x40) {
+-		c = c^0x07 ;
+-	}
+-	if(b&0x20) {
+-		c = c^0x06 ;
+-	}
+-	if(b&0x10) {
+-		c = c^0x05 ;
+-	}
+-	if(b&0x08) {
+-		c = c^0x03 ;
+-	}
+-	if(b&0x04) {
+-		c = c^0x04 ;
+-	}
+-	if(b&0x02) {
+-		c = c^0x02 ;
+-	}
+-	if(b&0x01) {
+-		c = c^0x01 ;
+-	}
+-	switch(c) {
+-	case 0 :
+-		b = b >> 3 ;
+-		break ;
+-	case 1 :
+-		b = b >> 3 ;
+-		break ;
+-	case 2 :
+-		b = b >> 3 ;
+-		break ;
+-	case 3 :
+-		b = (b^0x08) >> 3 ;
+-		break ;
+-	case 4 :
+-		b = b >> 3 ;
+-		break ;
+-	case 5 :
+-		b = (b^0x10) >> 3 ;
+-		break ;
+-	case 6 :
+-		b = (b^0x20) >> 3 ;
+-		break ;
+-	case 7 :
+-		b = (b^0x40) >> 3 ;
+-		break ;
+-	}
+-	return (b & 0x0F);
+-}
++// static unsigned char hanming_decode_74(unsigned char  a)
++// {
++// 	unsigned char b=0,c=0;
++// 	b = a;
++// 	c = 0;
++// 	if(b&0x40) {
++// 		c = c^0x07 ;
++// 	}
++// 	if(b&0x20) {
++// 		c = c^0x06 ;
++// 	}
++// 	if(b&0x10) {
++// 		c = c^0x05 ;
++// 	}
++// 	if(b&0x08) {
++// 		c = c^0x03 ;
++// 	}
++// 	if(b&0x04) {
++// 		c = c^0x04 ;
++// 	}
++// 	if(b&0x02) {
++// 		c = c^0x02 ;
++// 	}
++// 	if(b&0x01) {
++// 		c = c^0x01 ;
++// 	}
++// 	switch(c) {
++// 	case 0 :
++// 		b = b >> 3 ;
++// 		break ;
++// 	case 1 :
++// 		b = b >> 3 ;
++// 		break ;
++// 	case 2 :
++// 		b = b >> 3 ;
++// 		break ;
++// 	case 3 :
++// 		b = (b^0x08) >> 3 ;
++// 		break ;
++// 	case 4 :
++// 		b = b >> 3 ;
++// 		break ;
++// 	case 5 :
++// 		b = (b^0x10) >> 3 ;
++// 		break ;
++// 	case 6 :
++// 		b = (b^0x20) >> 3 ;
++// 		break ;
++// 	case 7 :
++// 		b = (b^0x40) >> 3 ;
++// 		break ;
++// 	}
++// 	return (b & 0x0F);
++// }
+ 
+ static unsigned char get_chip_value_from_efuse(void)
+ {
+@@ -126,7 +126,8 @@
+ {
+ 	char value;
+ 	value = get_chip_value_from_efuse();
+-	return hanming_decode_74(value);
++	// return hanming_decode_74(value);
++	return AX650C_CHIP;
+ }
+ 
+ static void core_clk_set(int clk)
+--- a/arch/arm/include/asm/arch-axera/boot_mode.h	2025-12-05 10:20:39.043711171 +0800
++++ b/arch/arm/include/asm/arch-axera/boot_mode.h	2025-12-05 10:01:07.412654217 +0800
+@@ -58,7 +58,9 @@
+ 	AX650A_SLT = 4,
+ 	AX650N_SLT = 5,
+ 	AX650N_PCIE = 7,
+-	AX650_BOARD_MAX = 8,
++	AX650N_M5stack_4G = 8,
++	AX650N_M5stack_8G = 11,
++	AX650_BOARD_MAX = 12,
+ } board_type_t;
+ 
+ typedef enum adp_plate_type {
+--- a/arch/arm/mach-axera/ax650/board.c	2025-12-05 10:20:39.043711171 +0800
++++ b/arch/arm/mach-axera/ax650/board.c	2025-12-05 10:07:09.911789699 +0800
+@@ -47,6 +47,8 @@
+ 	[AX650A_SLT] = "AX650A_SLT",
+ 	[AX650N_SLT] = "AX650N_SLT",
+ 	[AX650N_PCIE] = "AX650N_PCIE",
++	[AX650N_M5stack_4G] = "AX650N_M5stack_4G",
++	[AX650N_M5stack_8G] = "AX650N_M5stack_8G",
+ };
+ 
+ static const char * adp_plate_name[ADP_RX_MAX] = {
+@@ -194,6 +196,8 @@
+ 	if (AX650C_CHIP == get_chip_type_id()) {
+ 		board_name[AX650N_Demo] = "AX650C_Demo";
+ 		board_name[AX650N_PCIE] = "AX650C_PCIE";
++		board_name[AX650N_M5stack_4G] = "AX650N_M5stack_4G";
++		board_name[AX650N_M5stack_8G] = "AX650N_M5stack_8G";
+ 	}
+ 
+ 	if (id >= 0 && id < ARRAY_SIZE(board_name)) {
+--- a/board/axera/ax650_card/pinmux.c	2025-12-05 10:20:39.043711171 +0800
++++ b/board/axera/ax650_card/pinmux.c	2025-12-05 10:06:09.138593635 +0800
+@@ -59,6 +59,12 @@
+ 	[AX650N_EVB] =
+ 	    {ax650N_evb_pinmux,
+ 	     sizeof(ax650N_evb_pinmux) / sizeof(unsigned int)},
++	[AX650N_M5stack_4G] =
++	    {ax650N_demo_pinmux,
++	     sizeof(ax650N_demo_pinmux) / sizeof(unsigned int)},
++	[AX650N_M5stack_8G] =
++	    {ax650N_demo_pinmux,
++	     sizeof(ax650N_demo_pinmux) / sizeof(unsigned int)},
+ };
+ 
+ static void i2c_select_pad(void)
+@@ -98,6 +104,10 @@
+ 	if (AX650C_CHIP == get_chip_type_id()) {
+ 		ax650_pinmux_tbl[AX650N_Demo].data = ax650C_demo_pinmux;
+ 		ax650_pinmux_tbl[AX650N_Demo].size = sizeof(ax650C_demo_pinmux) / sizeof(unsigned int);
++		ax650_pinmux_tbl[AX650N_M5stack_4G].data = ax650C_demo_pinmux;
++		ax650_pinmux_tbl[AX650N_M5stack_4G].size = sizeof(ax650C_demo_pinmux) / sizeof(unsigned int);
++		ax650_pinmux_tbl[AX650N_M5stack_8G].data = ax650C_demo_pinmux;
++		ax650_pinmux_tbl[AX650N_M5stack_8G].size = sizeof(ax650C_demo_pinmux) / sizeof(unsigned int);
+ 	}
+ 
+ 	/* enable rtc sys */
+--- a/board/axera/ax650_emmc/pinmux.c	2025-12-05 10:20:39.043711171 +0800
++++ b/board/axera/ax650_emmc/pinmux.c	2025-12-05 10:08:54.253843049 +0800
+@@ -72,6 +72,12 @@
+ 	[AX650N_SLT] =
+ 	    {ax650N_slt_pinmux,
+ 	     sizeof(ax650N_slt_pinmux) / sizeof(unsigned int)},
++	[AX650N_M5stack_4G] =
++	    {ax650N_demo_pinmux,
++	     sizeof(ax650N_demo_pinmux) / sizeof(unsigned int)},
++	[AX650N_M5stack_8G] =
++	    {ax650N_demo_pinmux,
++	     sizeof(ax650N_demo_pinmux) / sizeof(unsigned int)},
+ };
+ 
+ static void i2c_select_pad(void)
+@@ -111,6 +117,10 @@
+ 	if (AX650C_CHIP == get_chip_type_id()) {
+ 		ax650_pinmux_tbl[AX650N_Demo].data = ax650C_demo_pinmux;
+ 		ax650_pinmux_tbl[AX650N_Demo].size = sizeof(ax650C_demo_pinmux) / sizeof(unsigned int);
++		ax650_pinmux_tbl[AX650N_M5stack_4G].data = ax650C_demo_pinmux;
++		ax650_pinmux_tbl[AX650N_M5stack_4G].size = sizeof(ax650C_demo_pinmux) / sizeof(unsigned int);
++		ax650_pinmux_tbl[AX650N_M5stack_8G].data = ax650C_demo_pinmux;
++		ax650_pinmux_tbl[AX650N_M5stack_8G].size = sizeof(ax650C_demo_pinmux) / sizeof(unsigned int);
+ 	}
+ 
+ 	/* enable rtc sys */
+--- a/board/axera/ax650_lp/pinmux.c	2025-12-05 10:20:39.043711171 +0800
++++ b/board/axera/ax650_lp/pinmux.c	2025-12-05 10:09:10.190156640 +0800
+@@ -66,6 +66,12 @@
+ 	[AX650N_SLT] =
+ 	    {ax650N_slt_pinmux,
+ 	     sizeof(ax650N_slt_pinmux) / sizeof(unsigned int)},
++	[AX650N_M5stack_4G] =
++	    {ax650N_demo_pinmux,
++	     sizeof(ax650N_demo_pinmux) / sizeof(unsigned int)},
++	[AX650N_M5stack_8G] =
++	    {ax650N_demo_pinmux,
++	     sizeof(ax650N_demo_pinmux) / sizeof(unsigned int)},
+ };
+ 
+ static void i2c_select_pad(void)
+--- a/board/axera/ax650_master/pinmux.c	2025-12-05 10:20:39.043711171 +0800
++++ b/board/axera/ax650_master/pinmux.c	2025-12-05 10:09:18.858327207 +0800
+@@ -66,6 +66,12 @@
+ 	[AX650N_SLT] =
+ 	    {ax650N_slt_pinmux,
+ 	     sizeof(ax650N_slt_pinmux) / sizeof(unsigned int)},
++	[AX650N_M5stack_4G] =
++	    {ax650N_demo_pinmux,
++	     sizeof(ax650N_demo_pinmux) / sizeof(unsigned int)},
++	[AX650N_M5stack_8G] =
++	    {ax650N_demo_pinmux,
++	     sizeof(ax650N_demo_pinmux) / sizeof(unsigned int)},
+ };
+ 
+ static void i2c_select_pad(void)
+--- a/board/axera/ax650_pipro_box/pinmux.c	2025-12-05 10:20:39.047711250 +0800
++++ b/board/axera/ax650_pipro_box/pinmux.c	2025-12-05 10:09:25.222452436 +0800
+@@ -66,6 +66,12 @@
+ 	[AX650N_SLT] =
+ 	    {ax650N_slt_pinmux,
+ 	     sizeof(ax650N_slt_pinmux) / sizeof(unsigned int)},
++	[AX650N_M5stack_4G] =
++	    {ax650N_demo_pinmux,
++	     sizeof(ax650N_demo_pinmux) / sizeof(unsigned int)},
++	[AX650N_M5stack_8G] =
++	    {ax650N_demo_pinmux,
++	     sizeof(ax650N_demo_pinmux) / sizeof(unsigned int)},
+ };
+ 
+ static void i2c_select_pad(void)
+--- a/board/axera/ax650_slave/pinmux.c	2025-12-05 10:20:39.047711250 +0800
++++ b/board/axera/ax650_slave/pinmux.c	2025-12-05 10:09:31.182569715 +0800
+@@ -53,6 +53,12 @@
+ 	[AX650N_EVB] =
+ 	    {ax650N_evb_pinmux,
+ 	     sizeof(ax650N_evb_pinmux) / sizeof(unsigned int)},
++	[AX650N_M5stack_4G] =
++	    {ax650N_demo_pinmux,
++	     sizeof(ax650N_demo_pinmux) / sizeof(unsigned int)},
++	[AX650N_M5stack_8G] =
++	    {ax650N_demo_pinmux,
++	     sizeof(ax650N_demo_pinmux) / sizeof(unsigned int)},
+ };
+ 
+ static void i2c_select_pad(void)
+--- a/board/axera/ax650_ssd/pinmux.c	2025-12-05 10:20:39.047711250 +0800
++++ b/board/axera/ax650_ssd/pinmux.c	2025-12-05 10:09:37.550695021 +0800
+@@ -66,6 +66,12 @@
+ 	[AX650N_SLT] =
+ 	    {ax650N_slt_pinmux,
+ 	     sizeof(ax650N_slt_pinmux) / sizeof(unsigned int)},
++	[AX650N_M5stack_4G] =
++	    {ax650N_demo_pinmux,
++	     sizeof(ax650N_demo_pinmux) / sizeof(unsigned int)},
++	[AX650N_M5stack_8G] =
++	    {ax650N_demo_pinmux,
++	     sizeof(ax650N_demo_pinmux) / sizeof(unsigned int)},
+ };
+ 
+ static void i2c_select_pad(void)
+
