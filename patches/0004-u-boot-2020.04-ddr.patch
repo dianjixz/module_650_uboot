@@ -6,7 +6,7 @@
  static int dp_slp_en __attribute__((section(".data"))) = 0;
 -static int curr_rank_num __attribute__((section(".data"))) = 2;	//default dual rank
 +static int curr_rank_num __attribute__((section(".data"))) = 1;	//default dual rank, will be modified in board_id
-+static int use_ddr_size __attribute__((section(".data"))) = 4; //will be modified in board_id
++static int use_ddr_size __attribute__((section(".data"))) = 2; //will be modified in board_id
  static int use_lpddr4 __attribute__((section(".data"))) = 0;	//default lpddr4x
  static int lpddr4x_6GB __attribute__((section(".data"))) = 0;
  static int lpddr4x_8GB __attribute__((section(".data"))) = 0;
@@ -32,7 +32,7 @@
 +		curr_rank_num = 1;
 +		use_ddr_size = 2;
 +	}else if(get_board_id() == AX650N_M5stack_8G){
-+		curr_rank_num = 2;
++		curr_rank_num = 1;
 +		use_ddr_size = 4;
 +	}
  	/* adc_read_boardid(1,&adc_data); //Users can read adc values to be compatible with different DDR types */

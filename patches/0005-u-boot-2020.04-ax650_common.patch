@@ -60,3 +60,18 @@ index 6dc69787..efa9a448 100755
  #ifdef CONFIG_AXERA_SUPPORT_AB_OTA
  	char *bootpart = env_get("bootpart");
  
+--- a/include/configs/ax650_common.h	2025-12-05 17:56:40.850901694 +0800
++++ b/include/configs/ax650_common.h	2025-12-05 17:56:35.466796142 +0800
+@@ -242,9 +242,9 @@
+ #endif
+ 
+ #define EMMCPARTS_DEFAULT	EMMCPARTS_DEFAULT_POST \
+-    "4736M(rootfs)," \
+-    "384M(soc)," \
+-    "1900M(opt)," \
++	"1M(recovery_dtb)," \
++	"74M(recovery)," \
++    "29668M(rootfs)" 
+ 
+ #define EMMCPARTS_MASTER	EMMCPARTS_DEFAULT_POST \
+ 	"2048M(rootfs)," \
