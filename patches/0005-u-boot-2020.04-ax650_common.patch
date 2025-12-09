@@ -47,19 +47,6 @@ index 6dc69787..efa9a448 100755
 +	"before_boot_cmd=run seti2c0m\0" \
  
  #endif
---- a/cmd/axera/boot/axera_boot.c	2025-12-05 12:01:11.473407109 +0800
-+++ b/cmd/axera/boot/axera_boot.c	2025-12-05 11:59:20.795244876 +0800
-@@ -327,6 +327,10 @@
- 	const char *x_kernel = "kernel";
- 	const char *x_dtb = "dtb";
- 
-+	char *axera_boot_after_cmd = env_get("before_boot_cmd");
-+	if(NULL != axera_boot_after_cmd) 
-+		run_command(axera_boot_after_cmd, 0);
-+
- #ifdef CONFIG_AXERA_SUPPORT_AB_OTA
- 	char *bootpart = env_get("bootpart");
- 
 --- a/include/configs/ax650_common.h	2025-12-05 17:56:40.850901694 +0800
 +++ b/include/configs/ax650_common.h	2025-12-05 17:56:35.466796142 +0800
 @@ -242,9 +242,9 @@
@@ -75,3 +62,18 @@ index 6dc69787..efa9a448 100755
  
  #define EMMCPARTS_MASTER	EMMCPARTS_DEFAULT_POST \
  	"2048M(rootfs)," \
+--- a/cmd/axera/boot/axera_boot.c	2025-12-09 10:25:29.478283937 +0800
++++ b/cmd/axera/boot/axera_boot.c	2025-12-09 10:25:59.882874413 +0800
+@@ -1215,6 +1215,12 @@
+ 	char *x_atf = "atf";
+ 	char *x_optee = "optee";
+ 
++
++	char *axera_boot_after_cmd = env_get("before_boot_cmd");
++	if(NULL != axera_boot_after_cmd) 
++		run_command(axera_boot_after_cmd, 0);
++
++
+ 	pr_err("enter do_axera_boot\n");
+ 	/* Turn on watchdog before booting to kernel. */
+ 	wdt0_enable(1);
