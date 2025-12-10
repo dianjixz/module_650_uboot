@@ -286,3 +286,14 @@
  
  static void i2c_select_pad(void)
 
+--- a/arch/arm/mach-axera/ax650/ax650.c	2025-12-10 20:06:33.000000000 +0800
++++ b/arch/arm/mach-axera/ax650/ax650.c	2025-12-10 20:06:40.000000000 +0800
+@@ -651,6 +651,8 @@
+ 	//for RD dailybuild test
+ 	adc_read_boardid(2,&adc_data);
+ 	switch (board_id) {
++	case AX650N_M5stack_4G:
++	case AX650N_M5stack_8G:
+ 	case AX650N_Demo:
+ 		pipe_pcs0_model_sel = 2;		// CTRL0 for PCIE EP
+ 		pipe_pcs1_model_sel = 2;		// CTRL1 for PCIE RC
