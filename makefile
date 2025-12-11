@@ -27,7 +27,7 @@ TARGET_DEFCONFIG    := $(BOARD_NAME)_emmc_$(BOARD_ARCH)_defconfig
 # ----------------------------------------------------------------------------
 PATCH_DIR           := patches
 DTS_DIR             := uboot-dts
-CONFIG_DIR          := 
+CONFIG_DIR          := defconfigs
 
 
 # ----------------------------------------------------------------------------
@@ -75,7 +75,7 @@ KERNEL_MAKE := +$(MAKE) -C $(SRC_DIR)  dtb-y=m5stack-ax650.dtb DEVICE_TREE=m5sta
 # ============================================================================
 # 主要目标
 # ============================================================================
-SIGN_EXTS := all install %_defconfig oldconfig %.bin u-boot menuconfig
+SIGN_EXTS := all install %_defconfig oldconfig %.bin u-boot menuconfig clean
 
 define SIGN_RULE
 $(1): _build_init
@@ -155,7 +155,7 @@ Packaxera:
         @echo "Axera signing tools not found. Skipping signing step."
 endif
 
-linux-distclean:
+uboot-distclean:
 	@$(KERNEL_MAKE) distclean
 
 distclean:

@@ -8,7 +8,7 @@ auto compile:
 sudo apt install flex bison libssl-dev libelf-dev
 source /opt/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bash.bashrc
 make distclean
-make ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- AX650_emmc_defconfig
+make ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- m5stack_AX650C_emmc_arm_defconfig
 make ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- -j `nproc`
 make Packaxera
 ```

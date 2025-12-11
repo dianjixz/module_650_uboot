@@ -29,8 +29,8 @@ index 3413084e..d9c2cb5f 100755
 +
 +
 +#define CONFIG_EXTRA_ENV_SETTINGS		\
-+	"seti2c0m=mw 0x4250688 0x4001\0" \
-+	"before_boot_cmd=run seti2c0m\0" \
++	"firstsaveenv=if test -n \"$envset\"; then echo \"env already set\"; else setenv envset true; saveenv; fi\0" \
++	"before_boot_cmd=run firstsaveenv\0" \
 +
  #endif
  
@@ -43,8 +43,8 @@ index 6dc69787..efa9a448 100755
  	"     setenv bootpart A; " \
  	"  fi; setenv bootcount 0; saveenv; " \
  	"  run bootcmd\0" \
-+	"seti2c0m=mw 0x4250688 0x4001\0" \
-+	"before_boot_cmd=run seti2c0m\0" \
++	"firstsaveenv=if test -n \"$envset\"; then echo \"env already set\"; else setenv envset true; saveenv; fi\0" \
++	"before_boot_cmd=run firstsaveenv\0" \
  
  #endif
 --- a/include/configs/ax650_common.h	2025-12-05 17:56:40.850901694 +0800

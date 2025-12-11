@@ -1,6 +1,58 @@
---- a/arch/arm/mach-axera/ax650/chip_config.c	2025-11-24 11:22:19.162341356 +0800
-+++ b/arch/arm/mach-axera/ax650/chip_config.c	2025-11-24 11:22:19.206342063 +0800
-@@ -46,60 +46,60 @@
+diff --git a/arch/arm/include/asm/arch-axera/boot_mode.h b/arch/arm/include/asm/arch-axera/boot_mode.h
+index 9961ce73..7e0b756d 100755
+--- a/arch/arm/include/asm/arch-axera/boot_mode.h
++++ b/arch/arm/include/asm/arch-axera/boot_mode.h
+@@ -58,7 +58,9 @@ typedef enum board_type {
+ 	AX650A_SLT = 4,
+ 	AX650N_SLT = 5,
+ 	AX650N_PCIE = 7,
+-	AX650_BOARD_MAX = 8,
++	AX650N_M5stack_4G = 8,
++	AX650N_M5stack_8G = 11,
++	AX650_BOARD_MAX = 12,
+ } board_type_t;
+ 
+ typedef enum adp_plate_type {
+diff --git a/arch/arm/mach-axera/ax650/ax650.c b/arch/arm/mach-axera/ax650/ax650.c
+index 90c525cf..fd432ab6 100644
+--- a/arch/arm/mach-axera/ax650/ax650.c
++++ b/arch/arm/mach-axera/ax650/ax650.c
+@@ -651,6 +651,8 @@ static int pcie_sata_mode_init(void)
+ 	//for RD dailybuild test
+ 	adc_read_boardid(2,&adc_data);
+ 	switch (board_id) {
++	case AX650N_M5stack_4G:
++	case AX650N_M5stack_8G:
+ 	case AX650N_Demo:
+ 		pipe_pcs0_model_sel = 2;		// CTRL0 for PCIE EP
+ 		pipe_pcs1_model_sel = 2;		// CTRL1 for PCIE RC
+diff --git a/arch/arm/mach-axera/ax650/board.c b/arch/arm/mach-axera/ax650/board.c
+index a65ddc52..555b3704 100644
+--- a/arch/arm/mach-axera/ax650/board.c
++++ b/arch/arm/mach-axera/ax650/board.c
+@@ -47,6 +47,8 @@ static const char * board_name[AX650_BOARD_MAX] = {
+ 	[AX650A_SLT] = "AX650A_SLT",
+ 	[AX650N_SLT] = "AX650N_SLT",
+ 	[AX650N_PCIE] = "AX650N_PCIE",
++	[AX650N_M5stack_4G] = "AX650N_M5stack_4G",
++	[AX650N_M5stack_8G] = "AX650N_M5stack_8G",
+ };
+ 
+ static const char * adp_plate_name[ADP_RX_MAX] = {
+@@ -194,6 +196,8 @@ const char* __attribute__((weak)) board_id_to_name(int id)
+ 	if (AX650C_CHIP == get_chip_type_id()) {
+ 		board_name[AX650N_Demo] = "AX650C_Demo";
+ 		board_name[AX650N_PCIE] = "AX650C_PCIE";
++		board_name[AX650N_M5stack_4G] = "AX650N_M5stack_4G";
++		board_name[AX650N_M5stack_8G] = "AX650N_M5stack_8G";
+ 	}
+ 
+ 	if (id >= 0 && id < ARRAY_SIZE(board_name)) {
+diff --git a/arch/arm/mach-axera/ax650/chip_config.c b/arch/arm/mach-axera/ax650/chip_config.c
+index 0ef38e79..eae3462c 100644
+--- a/arch/arm/mach-axera/ax650/chip_config.c
++++ b/arch/arm/mach-axera/ax650/chip_config.c
+@@ -46,60 +46,60 @@ static int cpu_clk_configed __attribute__((section(".data"))) = 0;
  static int cpu_clk_set __attribute__((section(".data"))) = CPU_CLK_SET;
  
  /* To get the ID of the chip type. */
@@ -115,7 +167,7 @@
  
  static unsigned char get_chip_value_from_efuse(void)
  {
-@@ -126,7 +126,8 @@
+@@ -126,7 +126,8 @@ unsigned char get_chip_type_id(void)
  {
  	char value;
  	value = get_chip_value_from_efuse();
@@ -125,42 +177,11 @@
  }
  
  static void core_clk_set(int clk)
---- a/arch/arm/include/asm/arch-axera/boot_mode.h	2025-12-05 10:20:39.043711171 +0800
-+++ b/arch/arm/include/asm/arch-axera/boot_mode.h	2025-12-05 10:01:07.412654217 +0800
-@@ -58,7 +58,9 @@
- 	AX650A_SLT = 4,
- 	AX650N_SLT = 5,
- 	AX650N_PCIE = 7,
--	AX650_BOARD_MAX = 8,
-+	AX650N_M5stack_4G = 8,
-+	AX650N_M5stack_8G = 11,
-+	AX650_BOARD_MAX = 12,
- } board_type_t;
- 
- typedef enum adp_plate_type {
---- a/arch/arm/mach-axera/ax650/board.c	2025-12-05 10:20:39.043711171 +0800
-+++ b/arch/arm/mach-axera/ax650/board.c	2025-12-05 10:07:09.911789699 +0800
-@@ -47,6 +47,8 @@
- 	[AX650A_SLT] = "AX650A_SLT",
- 	[AX650N_SLT] = "AX650N_SLT",
- 	[AX650N_PCIE] = "AX650N_PCIE",
-+	[AX650N_M5stack_4G] = "AX650N_M5stack_4G",
-+	[AX650N_M5stack_8G] = "AX650N_M5stack_8G",
- };
- 
- static const char * adp_plate_name[ADP_RX_MAX] = {
-@@ -194,6 +196,8 @@
- 	if (AX650C_CHIP == get_chip_type_id()) {
- 		board_name[AX650N_Demo] = "AX650C_Demo";
- 		board_name[AX650N_PCIE] = "AX650C_PCIE";
-+		board_name[AX650N_M5stack_4G] = "AX650N_M5stack_4G";
-+		board_name[AX650N_M5stack_8G] = "AX650N_M5stack_8G";
- 	}
- 
- 	if (id >= 0 && id < ARRAY_SIZE(board_name)) {
---- a/board/axera/ax650_card/pinmux.c	2025-12-05 10:20:39.043711171 +0800
-+++ b/board/axera/ax650_card/pinmux.c	2025-12-05 10:06:09.138593635 +0800
-@@ -59,6 +59,12 @@
+diff --git a/board/axera/ax650_card/pinmux.c b/board/axera/ax650_card/pinmux.c
+index 7d3dea16..385ae76d 100644
+--- a/board/axera/ax650_card/pinmux.c
++++ b/board/axera/ax650_card/pinmux.c
+@@ -59,6 +59,12 @@ struct pinmux ax650_pinmux_tbl[] = {
  	[AX650N_EVB] =
  	    {ax650N_evb_pinmux,
  	     sizeof(ax650N_evb_pinmux) / sizeof(unsigned int)},
@@ -173,7 +194,14 @@
  };
  
  static void i2c_select_pad(void)
-@@ -98,6 +104,10 @@
+@@ -92,12 +98,16 @@ int pinmux_init(void)
+ 	int index, i;
+ 	int emmc_phy_flag = 0, sd_phy_flag = 0, sdio_phy_flag = 0, rtc_sys_flag = 0;
+ 	index = get_board_id();
+-	if (index < 0 || index > 8)
++	if (index < 0 || index >= AX650_BOARD_MAX)
+ 		return 0;
+ 
  	if (AX650C_CHIP == get_chip_type_id()) {
  		ax650_pinmux_tbl[AX650N_Demo].data = ax650C_demo_pinmux;
  		ax650_pinmux_tbl[AX650N_Demo].size = sizeof(ax650C_demo_pinmux) / sizeof(unsigned int);
@@ -184,9 +212,11 @@
  	}
  
  	/* enable rtc sys */
---- a/board/axera/ax650_emmc/pinmux.c	2025-12-05 10:20:39.043711171 +0800
-+++ b/board/axera/ax650_emmc/pinmux.c	2025-12-05 10:08:54.253843049 +0800
-@@ -72,6 +72,12 @@
+diff --git a/board/axera/ax650_emmc/pinmux.c b/board/axera/ax650_emmc/pinmux.c
+index 6310b46d..85fe2385 100644
+--- a/board/axera/ax650_emmc/pinmux.c
++++ b/board/axera/ax650_emmc/pinmux.c
+@@ -72,6 +72,12 @@ struct pinmux ax650_pinmux_tbl[] = {
  	[AX650N_SLT] =
  	    {ax650N_slt_pinmux,
  	     sizeof(ax650N_slt_pinmux) / sizeof(unsigned int)},
@@ -199,7 +229,14 @@
  };
  
  static void i2c_select_pad(void)
-@@ -111,6 +117,10 @@
+@@ -105,12 +111,16 @@ int pinmux_init(void)
+ 	int index, i;
+ 	int emmc_phy_flag = 0, sd_phy_flag = 0, sdio_phy_flag = 0, rtc_sys_flag = 0;
+ 	index = get_board_id();
+-	if (index < 0 || index > 8)
++	if (index < 0 || index >= AX650_BOARD_MAX)
+ 		return 0;
+ 
  	if (AX650C_CHIP == get_chip_type_id()) {
  		ax650_pinmux_tbl[AX650N_Demo].data = ax650C_demo_pinmux;
  		ax650_pinmux_tbl[AX650N_Demo].size = sizeof(ax650C_demo_pinmux) / sizeof(unsigned int);
@@ -210,9 +247,11 @@
  	}
  
  	/* enable rtc sys */
---- a/board/axera/ax650_lp/pinmux.c	2025-12-05 10:20:39.043711171 +0800
-+++ b/board/axera/ax650_lp/pinmux.c	2025-12-05 10:09:10.190156640 +0800
-@@ -66,6 +66,12 @@
+diff --git a/board/axera/ax650_lp/pinmux.c b/board/axera/ax650_lp/pinmux.c
+index 6ee13c62..dbc18a54 100644
+--- a/board/axera/ax650_lp/pinmux.c
++++ b/board/axera/ax650_lp/pinmux.c
+@@ -66,6 +66,12 @@ struct pinmux ax650A_pinmux_tbl[] = {
  	[AX650N_SLT] =
  	    {ax650N_slt_pinmux,
  	     sizeof(ax650N_slt_pinmux) / sizeof(unsigned int)},
@@ -225,9 +264,20 @@
  };
  
  static void i2c_select_pad(void)
---- a/board/axera/ax650_master/pinmux.c	2025-12-05 10:20:39.043711171 +0800
-+++ b/board/axera/ax650_master/pinmux.c	2025-12-05 10:09:18.858327207 +0800
-@@ -66,6 +66,12 @@
+@@ -99,7 +105,7 @@ int pinmux_init(void)
+ 	int index, i;
+ 	int emmc_phy_flag = 0, sd_phy_flag = 0, sdio_phy_flag = 0, rtc_sys_flag = 0;
+ 	index = get_board_id();
+-	if (index < 0 || index > 8)
++	if (index < 0 || index >= AX650_BOARD_MAX)
+ 		return 0;
+ 	/* enable rtc sys */
+ 	writel(1 << FLASH_SYS_RTC_PINMUX_CFG_OFFSET, FLASH_SYS_RTC_PINMUX_CFG_SET);
+diff --git a/board/axera/ax650_master/pinmux.c b/board/axera/ax650_master/pinmux.c
+index 184c0fb1..33ca1d87 100644
+--- a/board/axera/ax650_master/pinmux.c
++++ b/board/axera/ax650_master/pinmux.c
+@@ -66,6 +66,12 @@ struct pinmux ax650A_pinmux_tbl[] = {
  	[AX650N_SLT] =
  	    {ax650N_slt_pinmux,
  	     sizeof(ax650N_slt_pinmux) / sizeof(unsigned int)},
@@ -240,9 +290,20 @@
  };
  
  static void i2c_select_pad(void)
---- a/board/axera/ax650_pipro_box/pinmux.c	2025-12-05 10:20:39.047711250 +0800
-+++ b/board/axera/ax650_pipro_box/pinmux.c	2025-12-05 10:09:25.222452436 +0800
-@@ -66,6 +66,12 @@
+@@ -99,7 +105,7 @@ int pinmux_init(void)
+ 	int index, i;
+ 	int emmc_phy_flag = 0, sd_phy_flag = 0, sdio_phy_flag = 0, rtc_sys_flag = 0;
+ 	index = get_board_id();
+-	if (index < 0 || index > 8)
++	if (index < 0 || index >= AX650_BOARD_MAX)
+ 		return 0;
+ 	/* enable rtc sys */
+ 	writel(1 << FLASH_SYS_RTC_PINMUX_CFG_OFFSET, FLASH_SYS_RTC_PINMUX_CFG_SET);
+diff --git a/board/axera/ax650_pipro_box/pinmux.c b/board/axera/ax650_pipro_box/pinmux.c
+index 07e0f1ef..8f18a4a5 100644
+--- a/board/axera/ax650_pipro_box/pinmux.c
++++ b/board/axera/ax650_pipro_box/pinmux.c
+@@ -66,6 +66,12 @@ struct pinmux ax650A_pinmux_tbl[] = {
  	[AX650N_SLT] =
  	    {ax650N_slt_pinmux,
  	     sizeof(ax650N_slt_pinmux) / sizeof(unsigned int)},
@@ -255,9 +316,20 @@
  };
  
  static void i2c_select_pad(void)
---- a/board/axera/ax650_slave/pinmux.c	2025-12-05 10:20:39.047711250 +0800
-+++ b/board/axera/ax650_slave/pinmux.c	2025-12-05 10:09:31.182569715 +0800
-@@ -53,6 +53,12 @@
+@@ -99,7 +105,7 @@ int pinmux_init(void)
+ 	int index, i;
+ 	int emmc_phy_flag = 0, sd_phy_flag = 0, sdio_phy_flag = 0, rtc_sys_flag = 0;
+ 	index = get_board_id();
+-	if (index < 0 || index > 8)
++	if (index < 0 || index >= AX650_BOARD_MAX)
+ 		return 0;
+ 	/* enable rtc sys */
+ 	writel(1 << FLASH_SYS_RTC_PINMUX_CFG_OFFSET, FLASH_SYS_RTC_PINMUX_CFG_SET);
+diff --git a/board/axera/ax650_slave/pinmux.c b/board/axera/ax650_slave/pinmux.c
+index f579c0ee..9d0e715e 100644
+--- a/board/axera/ax650_slave/pinmux.c
++++ b/board/axera/ax650_slave/pinmux.c
+@@ -53,6 +53,12 @@ struct pinmux ax650A_pinmux_tbl[] = {
  	[AX650N_EVB] =
  	    {ax650N_evb_pinmux,
  	     sizeof(ax650N_evb_pinmux) / sizeof(unsigned int)},
@@ -270,9 +342,20 @@
  };
  
  static void i2c_select_pad(void)
---- a/board/axera/ax650_ssd/pinmux.c	2025-12-05 10:20:39.047711250 +0800
-+++ b/board/axera/ax650_ssd/pinmux.c	2025-12-05 10:09:37.550695021 +0800
-@@ -66,6 +66,12 @@
+@@ -86,7 +92,7 @@ int pinmux_init(void)
+ 	int index, i;
+ 	int emmc_phy_flag = 0, sd_phy_flag = 0, sdio_phy_flag = 0, rtc_sys_flag = 0;
+ 	index = get_board_id();
+-	if (index < 0 || index > 8)
++	if (index < 0 || index >= AX650_BOARD_MAX)
+ 		return 0;
+ 	/* enable rtc sys */
+ 	writel(1 << FLASH_SYS_RTC_PINMUX_CFG_OFFSET, FLASH_SYS_RTC_PINMUX_CFG_SET);
+diff --git a/board/axera/ax650_ssd/pinmux.c b/board/axera/ax650_ssd/pinmux.c
+index 469fdcb9..d2c779ad 100644
+--- a/board/axera/ax650_ssd/pinmux.c
++++ b/board/axera/ax650_ssd/pinmux.c
+@@ -66,6 +66,12 @@ struct pinmux ax650A_pinmux_tbl[] = {
  	[AX650N_SLT] =
  	    {ax650N_slt_pinmux,
  	     sizeof(ax650N_slt_pinmux) / sizeof(unsigned int)},
@@ -285,15 +368,12 @@
  };
  
  static void i2c_select_pad(void)
-
---- a/arch/arm/mach-axera/ax650/ax650.c	2025-12-10 20:06:33.000000000 +0800
-+++ b/arch/arm/mach-axera/ax650/ax650.c	2025-12-10 20:06:40.000000000 +0800
-@@ -651,6 +651,8 @@
- 	//for RD dailybuild test
- 	adc_read_boardid(2,&adc_data);
- 	switch (board_id) {
-+	case AX650N_M5stack_4G:
-+	case AX650N_M5stack_8G:
- 	case AX650N_Demo:
- 		pipe_pcs0_model_sel = 2;		// CTRL0 for PCIE EP
- 		pipe_pcs1_model_sel = 2;		// CTRL1 for PCIE RC
+@@ -99,7 +105,7 @@ int pinmux_init(void)
+ 	int index, i;
+ 	int emmc_phy_flag = 0, sd_phy_flag = 0, sdio_phy_flag = 0, rtc_sys_flag = 0;
+ 	index = get_board_id();
+-	if (index < 0 || index > 8)
++	if (index < 0 || index >= AX650_BOARD_MAX)
+ 		return 0;
+ 	/* enable rtc sys */
+ 	writel(1 << FLASH_SYS_RTC_PINMUX_CFG_OFFSET, FLASH_SYS_RTC_PINMUX_CFG_SET);

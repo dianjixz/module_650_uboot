@@ -1,0 +1,13 @@
+diff --git a/arch/arm/mach-axera/ax650/ax650.c b/arch/arm/mach-axera/ax650/ax650.c
+index fd432ab6..10cc0031 100644
+--- a/arch/arm/mach-axera/ax650/ax650.c
++++ b/arch/arm/mach-axera/ax650/ax650.c
+@@ -232,7 +232,7 @@ static void print_board_info(void)
+ 
+ //#define SATA_LIMIT_1G5
+ //#define SATA_LIMIT_3G
+-#define AX_PIPE_DEBUG
++// #define AX_PIPE_DEBUG
+ static void core_write_word(ulong reg, u32 val)
+ {
+ #ifdef AX_PIPE_DEBUG
