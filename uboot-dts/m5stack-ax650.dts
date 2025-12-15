@@ -66,11 +66,11 @@
 		compatible = "axera,ax650-eqos";
 		status = "okay";
 	};
-
-	// pcie0_ep: pcie_ep@0 {
-	// 	compatible = "axera,axera-pcie-ep";
-	// 	status = "okay";
-	// };
+	// pcie drv use
+	pcie0_ep: pcie_ep@0 {
+		compatible = "axera,axera-pcie-ep";
+		status = "okay";
+	};
 };
 
 &pcie0_rc {
